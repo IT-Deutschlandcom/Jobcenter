@@ -32,10 +32,10 @@ try {
     $get = fn($id) => service_query('SELECT * FROM users WHERE id = ?', [$id])->fetch();
     check(count(rank_catalog()) === 55, 'Rangkatalog unvollständig.');
     check(!can_manage($get($member)) && can_manage($get($leader)), 'Führungsgrenze falsch.');
-    foreach ([[19, 0, 20, 0], [20, 0, 20, 1], [20, 10, 21, 0], [48, 10, 49, 0]] as $case) {
+    foreach ([[19, 0, 20, 0], [20, 0, 20, 1], [20, 10, 21, 0], [48, 10, 49, 0], [49, 0, 49, 1], [49, 9, 49, 10]] as $case) {
         check(next_rank(['rank_id' => $case[0], 'rank_step' => $case[1]]) === ['rank_id' => $case[2], 'rank_step' => $case[3]], 'Rangübergang falsch.');
     }
-    check(next_rank(['rank_id' => 49, 'rank_step' => 0]) === null, 'Führungsrechte automatisch vergeben.');
+    check(next_rank(['rank_id' => 49, 'rank_step' => 10]) === null, 'Führungsrechte automatisch vergeben.');
     check(earned_seconds(['active_since' => null], time()) === 0, 'Offlinezeit wurde gezählt.');
     denied(fn() => duty_action($member, $intel, 'start'));
     duty_action($member, $member, 'start');
@@ -74,7 +74,12 @@ try {
     $intelPending = pending_promotions($get($intel));
     duty_action($leader, $intel, 'confirm', $intelPending[0]['id']);
     check((int) $get($intel)['rank_step'] === 1 && (int) $get($intel)['rank_id'] === 20, 'Intel 0/10 → 1/10 falsch.');
-    service_query('UPDATE users SET rank_id = 49, rank_step = 0, promotion_seconds = 7200 WHERE id = ?', [$intel]);
+    service_query('UPDATE users SET rank_id = 49, rank_step = 9, promotion_seconds = 7200 WHERE id = ?', [$intel]);
+    synchronize_user($intel);
+    $elitePending = pending_promotions($get($intel));
+    check(count($elitePending) === 1, 'Letzter Intel-Schritt fehlt.');
+    duty_action($leader, $intel, 'confirm', $elitePending[0]['id']);
+    check((int) $get($intel)['rank_step'] === 10, 'Europol Elite 10/10 nicht erreicht.');
     synchronize_user($intel);
     check(pending_promotions($get($intel)) === [], 'Elite hat automatischen Aufstieg.');
     echo "Alle EURO-Rang-, Zeit-, Berechtigungs- und Audit-Tests bestanden.\n";

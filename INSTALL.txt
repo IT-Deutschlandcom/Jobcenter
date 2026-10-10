@@ -28,9 +28,9 @@ rank_catalog.php ist die zentrale, anpassbare Rangliste. Nicht mitgelieferte
 Zwischenbezeichnungen wurden als Vorschlag ergänzt und sollten vor dem Betrieb
 mit der endgültigen EURO-Rangliste abgeglichen werden.
 TAC: Rang 1–19, eine bestätigte Stunde je Aufstieg.
-Intel: Rang 20–48, jeweils 0/10–10/10, eine Stunde pro Schritt; nach 10/10
+Intel: Rang 20–49, jeweils 0/10–10/10, eine Stunde pro Schritt; nach 10/10
 folgt mit einer weiteren Stunde der nächste Rang bei 0/10.
-Rang 49: Europol Elite, automatisches Karriereziel. Rang 50 Squad Leader und
+Rang 49: Europol Elite 10/10, automatisches Karriereziel. Rang 50 Squad Leader und
 weitere Führungsränge werden administrativ vergeben, nicht durch Dienststunden.
 Ab Rang 50: BF-Panel, andere Mitarbeiter an-/abmelden, Vorschläge bestätigen,
 Stundenübersicht und Protokolle. Selbstbeförderungen sind gesperrt.

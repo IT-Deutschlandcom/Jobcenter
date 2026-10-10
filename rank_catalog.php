@@ -54,11 +54,14 @@ function next_rank($user)
     $id = (int) $user['rank_id'];
     $step = (int) $user['rank_step'];
     // Führungsrechte werden ausschließlich durch die Administration vergeben.
-    if ($id >= 49) {
+    if ($id >= 50) {
         return null;
     }
     if ($id >= 20 && $step < 10) {
         return ['rank_id' => $id, 'rank_step' => $step + 1];
+    }
+    if ($id >= 49) {
+        return null;
     }
     return ['rank_id' => $id + 1, 'rank_step' => 0];
 }
