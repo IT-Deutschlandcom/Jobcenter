@@ -172,7 +172,7 @@ td, th
 }
 
 /* Match the dashboard without changing the member-area templates. */
-body { color: #243b4b; }
+body { color: #e6f0f6; }
 a { color: #176383; }
 a:hover { color: #12374b; text-decoration: underline; }
 .header, .content, .foot, .message {
