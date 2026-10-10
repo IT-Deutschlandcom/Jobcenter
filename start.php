@@ -1,7 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de">
 <head>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta http-equiv="Content-Type" content="text/html;  charset=iso-8859-1" />
 	<meta name="description" content="An minimal site format" />
 	<meta name="keywords" content="blog" />
@@ -14,13 +15,13 @@
    
         
 
-        <div id="header"><h1>CYBERFORCE SECURITY AGENCY</span></h1></div>
+        <div id="header"><span class="brand-mark">CSA</span><div><h1>CYBERFORCE SECURITY AGENCY</h1><p>Dein Jobcenter im Habbo Hotel</p></div></div>
 
       <div id="wrapper">
 
         <div id="navigation">
            <ul>
-                <li class="current_page_item"><a href="start.php">Home</a></li>
+                <li class="current_page_item"><a href="start.php" aria-current="page">Dashboard</a></li>
                 <li><a href="news.php">News</a></li>
                 <li><a href="rangliste.php">Rangliste</a></li>
                 <li><a href="sonstiges.php">Sonstiges</a></li>
@@ -32,6 +33,16 @@
 
       
         <div id="content-wrapper">
+            <div class="dashboard-welcome">
+                <span class="eyebrow">CSA Staff Area</span>
+                <h2>Willkommen im Dashboard!</h2>
+                <p>Dein Einstieg in die CSA: Neuigkeiten, Karriere und Team auf einen Blick.</p>
+            </div>
+            <div class="dashboard-cards">
+                <a class="dashboard-card" href="news.php"><strong>News</strong><span>Alles Neue aus der Agency &rarr;</span></a>
+                <a class="dashboard-card" href="rangliste.php"><strong>Rangliste</strong><span>Dein Weg nach oben &rarr;</span></a>
+                <a class="dashboard-card" href="ranks.php"><strong>Unser Team</strong><span>Die F&uuml;hrungsebene &rarr;</span></a>
+            </div>
             <div id="content">
                 <h3 class="post-title"><a href="#">Die Idee</a></h3>
                 <p>Alle von uns haben bereits in verschiedenen Jobcentern gearbeitet und fanden immer mehr Anstosspunkte, die die Arbeit dort nicht mehr lohnenswert machten.
@@ -71,4 +82,3 @@ Wenn ihr uns unterst&uuml;tzen wollt, scheut euch nicht, uns beizutreten. Jedes 
 </body>
 
 </html>
-

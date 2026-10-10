@@ -1,7 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de">
 <head>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta http-equiv="Content-Type" content="text/html;  charset=iso-8859-1" />
 	<meta name="description" content="An minimal site format" />
 	<meta name="keywords" content="blog" />
@@ -14,17 +15,17 @@
    
         
 
-        <div id="header"><h1>CYBERFORCE SECURITY AGENCY</span></h1></div>
+        <div id="header"><span class="brand-mark">CSA</span><div><h1>CYBERFORCE SECURITY AGENCY</h1><p>Dein Jobcenter im Habbo Hotel</p></div></div>
 
       <div id="wrapper">
 
         <div id="navigation">
            <ul>
-                <li><a href="start.php">Home</a></li>
+                <li><a href="start.php">Dashboard</a></li>
                 <li><a href="news.php">News</a></li>
                 <li><a href="rangliste.php">Rangliste</a></li>
                 <li><a href="sonstiges.php">Sonstiges</a></li>
-                <li class="current_page_item"><a href="ranks.php">F&uuml;hrungsebene</a></li>
+                <li class="current_page_item"><a href="ranks.php" aria-current="page">F&uuml;hrungsebene</a></li>
            </ul>
         </div>
         
@@ -198,7 +199,7 @@
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
-    [-Der Rang "Base General" ist für 500 Taler käuflich erwerblich!-]
+    [-Der Rang "Base General" ist f&uuml;r 500 Taler k&auml;uflich erwerblich!-]
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
@@ -206,7 +207,7 @@
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
-    [-Der Rang "Trainer" ist für 200 Taler käuflich erwerblich!-]
+    [-Der Rang "Trainer" ist f&uuml;r 200 Taler k&auml;uflich erwerblich!-]
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
@@ -218,7 +219,7 @@
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
-    Es wurden neue Trainerränge eingeführt:
+    Es wurden neue Trainerr&auml;nge eingef&uuml;hrt:
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
@@ -304,4 +305,3 @@
 </body>
 
 </html>
-

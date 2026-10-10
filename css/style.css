@@ -1,168 +1,50 @@
-@import url(http://fonts.googleapis.com/css?family=Exo:100,200,400);
-@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:700,400,300);
-
-body{
-	margin: 0;
-	padding: 0;
-	background: #003a51 url('http://images-eu.habbo.com/habboweb/63_1dc60c6d6ea6e089c6893ab4e0541ee0/3178/web-gallery/images/v3/bg_texture_1.out.png') fixed;
-	color: #fff;
-	font-family: Arial;
-	font-size: 12px;
-}
-
-.body{
-	position: absolute;
-	top: -20px;
-	left: -20px;
-	bottom: -40px;
-	width: auto;
-	height: auto;
-	background-size: cover;
-	-webkit-filter: blur(5px);
-	z-index: 0;
-	background: #000;
-}
-
-.grad{
-	position: relative;
-	top: -20px;
-	left: -20px;
-	right: -40px;
-	bottom: -40px;
-	width: auto;
-	height: auto;
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0)), color-stop(100%,rgba(0,0,0,0.65))); /* Chrome,Safari4+ */
-	z-index: 1;
-	opacity: 0.7;
-}
-
-.header{
-	position: absolute;
-	top: calc(50% - 67px);
-	left: calc(50% - 160px);
-	z-index: 2;
-}
-
-.header div{
-	float: left;
-	color: #fff;
-	font-family: 'Exo', sans-serif;
-	font-size: 35px;
-	font-weight: 200;
-}
-
-.header div span{
-	color: #fff !important;
-}
-
-.login{
-	position: absolute;
-	top: calc(50% - 75px);
-	left: calc(50% - 50px);
-	height: 150px;
-	width: 350px;
-	padding: 10px;
-	z-index: 2;
-	color: #fff;
-}
-
-.login input[type=text]{
-	width: 250px;
-	height: 30px;
-	background: transparent;
-	border: 1px solid rgba(255,255,255,0.6);
-	border-radius: 2px;
-	color: #fff;
-	font-family: 'Exo', sans-serif;
-	font-size: 16px;
-	font-weight: 400;
-	padding: 4px;
-}
-
-.login input[type=password]{
-	width: 250px;
-	height: 30px;
-	background: transparent;
-	border: 1px solid rgba(255,255,255,0.6);
-	border-radius: 2px;
-	color: #fff;
-	font-family: 'Exo', sans-serif;
-	font-size: 16px;
-	font-weight: 400;
-	padding: 4px;
-	margin-top: 10px;
-}
-
-.login input[type=submit]{
-	float: left; margin-top: 10px; margin-left: 0px; -moz-border-radius: 5px; border-radius: 5px; border: 1px solid #A4A4A4; width: 261px; height: 30px; padding: 0px; background-image: -webkit-linear-gradient(white 0%, #D8D8D8 100%); background-image: -moz-linear-gradient(white 0%, #D8D8D8 100%);background-image: -o-linear-gradient(white 0%, #D8D8D8 100%); background-image: linear-gradient(white 0%, #D8D8D8 100%);
-}
-
-.login input[type=submit]:hover{
-	margin-top: 9px;
-	cursor: pointer;
-}
-
-.login input[type=submit]:active{
-	opacity: 0.6;
-	cursor: progress;
-}
-
-.login input[type=text]:focus{
-	outline: none;
-	border: 1px solid rgba(255,255,255,0.9);
-}
-
-.login input[type=password]:focus{
-	outline: none;
-	border: 1px solid rgba(255,255,255,0.9);
-}
-
-.login input[type=button]:focus{
-	outline: none;
-}
-
-::-webkit-input-placeholder{
-   color: rgba(255,255,255,0.6);
-}
-
-::-moz-input-placeholder{
-   color: rgba(255,255,255,0.6);
-}
-
-.link {
-	text-decoration: underline;
-	color: #000;
-}
+@import url("dashboard.css");
 
 #alert {
-	background-color: #F9D306;
-	height: 30px;
-	color: #000;
-	font-family: 'Exo', sans-serif;
-	font-weight: 400;
-	font-size: 16px;
-	padding: 8px 0px 0px 10px;
-	word-spacing: 2px;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 24px;
+	border-bottom: 2px solid #b88722;
+	background: #ffdb70;
+	color: #243b4b;
 }
 
-#x {
-	text-align: right;
-	margin-top: -21px; 
-	margin-right: 10px; 
+#x { margin-left: auto; }
+#alert a { color: #243b4b; font-weight: bold; text-decoration: underline; }
+
+.auth-shell {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	gap: 40px;
+	align-items: center;
+	max-width: 1000px;
+	margin: 60px auto;
+	padding: 24px;
 }
 
-#x a:link {
-	text-decoration: none;
-	color: #000;
+.auth-intro { color: #e6f0f6; }
+.auth-intro .brand-mark { margin-bottom: 24px; }
+.auth-intro h1 { color: #ffdb70; font-size: 36px; }
+.auth-intro .eyebrow { color: #c1d6e2; }
+.auth-intro a { color: #ffdb70; }
+
+.login {
+	padding: 32px;
+	border: 2px solid #092333;
+	border-radius: 6px;
+	background: #fff;
+	box-shadow: 6px 6px 0 #092333;
 }
 
-#x a:hover {
-	text-decoration: none;
-	color: #222;
-}
+.login input[type="submit"] { width: 100%; margin: 24px 0 20px; }
+.login p:last-child { margin: 0; text-align: center; }
+.login small { color: #526b7b; }
 
-.x {
-	background: #dedede;
-	border-radius: 500px;
-	color: #000;
+@media (max-width: 700px) {
+	.auth-shell { grid-template-columns: minmax(0, 1fr); gap: 24px; margin: 24px auto; padding: 16px; }
+	.auth-intro h1 { font-size: 28px; }
+	.login { padding: 24px; }
+	#alert { padding: 12px 16px; }
 }

@@ -1,7 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de">
 <head>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta http-equiv="Content-Type" content="text/html;  charset=iso-8859-1" />
 	<meta name="description" content="An minimal site format" />
 	<meta name="keywords" content="blog" />
@@ -14,14 +15,14 @@
    
         
 
-        <div id="header"><h1>CYBERFORCE SECURITY AGENCY</span></h1></div>
+        <div id="header"><span class="brand-mark">CSA</span><div><h1>CYBERFORCE SECURITY AGENCY</h1><p>Dein Jobcenter im Habbo Hotel</p></div></div>
 
       <div id="wrapper">
 
         <div id="navigation">
            <ul>
-                <li><a href="start.php">Home</a></li>
-                <li class="current_page_item"><a href="news.php">News</a></li>
+                <li><a href="start.php">Dashboard</a></li>
+                <li class="current_page_item"><a href="news.php" aria-current="page">News</a></li>
                 <li><a href="rangliste.php">Rangliste</a></li>
                 <li><a href="sonstiges.php">Sonstiges</a></li>
                 <li><a href="ranks.php">F&uuml;hrungsebene</a></li>
@@ -38,7 +39,7 @@
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
-    eröffnete die CSA am 01.03.2015 ihre Tore. Wir haben wochenlang viel
+    er&ouml;ffnete die CSA am 01.03.2015 ihre Tore. Wir haben wochenlang viel
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
@@ -62,11 +63,11 @@
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
-    gemeinsam mit uns Geschichte. Wir verfügen über attraktive
+    gemeinsam mit uns Geschichte. Wir verf&uuml;gen &uuml;ber attraktive
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
-    Arbeitsmodelle und verschieden Aufstiegsmöglichkeiten, somit ist der Spaß garantiert.
+    Arbeitsmodelle und verschieden Aufstiegsm&ouml;glichkeiten, somit ist der Spa&szlig; garantiert.
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
@@ -82,11 +83,11 @@
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
-    90 Minuten Arbeitszeit für eine Beförderung
+    90 Minuten Arbeitszeit f&uuml;r eine Bef&ouml;rderung
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
-    Jeden 2. Sonntag ist Double Sunday, an diesem Tag kann man 2 Beförderungen erlangen.
+    Jeden 2. Sonntag ist Double Sunday, an diesem Tag kann man 2 Bef&ouml;rderungen erlangen.
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
@@ -94,7 +95,7 @@
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
-    Wenn Ihr uns unterstützen wollt, scheut Euch nicht, uns beizutreten.
+    Wenn Ihr uns unterst&uuml;tzen wollt, scheut Euch nicht, uns beizutreten.
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
@@ -135,4 +136,3 @@
 </body>
 
 </html>
-
