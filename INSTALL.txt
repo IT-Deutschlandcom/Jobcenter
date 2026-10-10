@@ -1,0 +1,67 @@
+EURO CMS – PHP/MySQL, JavaScript und CSS ohne Build oder Framework
+
+Voraussetzungen: PHP 8.0+ mit pdo_mysql, MySQL 8.0+, HTTPS im Produktivbetrieb.
+Der Webserver muss PHP-Dateien ausführen, nicht als Quelltext ausliefern.
+
+Datenbank
+1. Backup der bestehenden Datenbank erstellen.
+2. Neuinstallation: users.sql in eine leere MySQL-Datenbank importieren.
+   Bestehende Installation: nur migration_euro.sql einmalig importieren.
+   Doppelte IDs/Benutzernamen vor der Migration bereinigen. Die bisherigen
+   Benutzer erhalten Rang 1, Stufe 0 und keine Dienstzeiten.
+3. Umgebungsvariablen für Webserver UND Cron setzen:
+   EURO_DB_HOST (Standard localhost), EURO_DB_PORT (Standard 3306),
+   EURO_DB_NAME (Standard euro), EURO_DB_USER, EURO_DB_PASSWORD.
+   Einen eigenen Datenbankbenutzer verwenden; keine Zugangsdaten einchecken.
+4. Ein Konto regulär registrieren. Die erste Führungskraft durch einen
+   vertrauenswürdigen Datenbankadministrator ernennen:
+   UPDATE users SET rank_id = 50, rank_step = 0 WHERE username = 'KONTONAME';
+   Keine automatische Adminvergabe an das erste registrierte Konto.
+5. Cron minütlich einrichten, damit Dienstzeiten und offene Vorschläge auch
+   ohne geöffneten Browser aktualisiert werden:
+   * * * * * /usr/bin/php /ABSOLUTER/INSTALLATIONSPFAD/promotion_tick.php
+   Der CLI-Prozess benötigt dieselben Datenbank-Umgebungsvariablen.
+   Ohne Cron wird beim Aufruf/Polling nachgerechnet; Dienstzeit geht nicht verloren.
+
+Ränge und Rechte
+rank_catalog.php ist die zentrale, anpassbare Rangliste. Nicht mitgelieferte
+Zwischenbezeichnungen wurden als Vorschlag ergänzt und sollten vor dem Betrieb
+mit der endgültigen EURO-Rangliste abgeglichen werden.
+TAC: Rang 1–19, eine bestätigte Stunde je Aufstieg.
+Intel: Rang 20–49, jeweils 0/10–10/10, eine Stunde pro Schritt; nach 10/10
+folgt mit einer weiteren Stunde der nächste Rang bei 0/10.
+Rang 49: Europol Elite 10/10, automatisches Karriereziel. Rang 50 Squad Leader und
+weitere Führungsränge werden administrativ vergeben, nicht durch Dienststunden.
+Ab Rang 50: BF-Panel, andere Mitarbeiter an-/abmelden, Vorschläge bestätigen,
+Stundenübersicht und Protokolle. Selbstbeförderungen sind gesperrt.
+Normale Mitglieder können nur ihren eigenen Dienst an-/abmelden und sehen
+nur eigene Beförderungshinweise, nicht die Stundenübersicht anderer Nutzer.
+
+Zeiterfassung
+Konto-Login und Dienst sind getrennt. Browser schließen beendet den Dienst
+nicht; explizit vom Dienst abmelden. Konto-Logout beendet den eigenen Dienst.
+Gesamtzeit und verbrauchbares Beförderungsguthaben sind getrennt. Restsekunden
+bleiben erhalten. Dienstanmeldungen, Abmeldungen, Ersteller/Dienstanmelder und
+Bestätiger werden dauerhaft protokolliert. Automatische Vorschläge werden der
+Person zugeordnet, die den betreffenden Dienst angemeldet hat.
+Offene Beförderungen werden nacheinander bestätigt. Mehrstündiges Guthaben
+geht nicht verloren. Ein neuer Vorschlag entsteht direkt nach Bestätigung,
+wenn weiterhin genügend Guthaben vorhanden ist.
+Alle CMS-Seiten prüfen alle 15 Sekunden; bei neuem Vorschlag bzw. weiterer
+voller Stunde erscheint ein Popup. Ein geschlossener Browser kann keine
+Popups anzeigen; beim nächsten Seitenaufruf werden offene Vorschläge angezeigt.
+Uhrzeiten im Protokoll verwenden die PHP-Serverzeitzone.
+
+Sicherheit
+Passwörter werden gehasht, SQL-Abfragen parametrisiert und schreibende Aktionen
+per POST/CSRF geschützt. Legacy-Klartextpasswörter werden beim nächsten gültigen
+Login gehasht; für noch nicht migrierte Konten Passwortzurücksetzung vorsehen.
+E-Mail-Adressen sind nicht in öffentlichen Mitgliederlisten sichtbar.
+SQL-Dateien und diese Installationshinweise auf Produktivsystemen nicht öffentlich
+ausliefern. BF-Berechtigungen werden bei jeder Aktion aus der Datenbank gelesen.
+
+Validierung
+PHP-Dateien mit php -l prüfen, JavaScript mit node --check js/promotions.js.
+Integrationstest ausschließlich in einer separaten Datenbank namens euro_test:
+users.sql dort importieren, EURO_DB_NAME=euro_test und DB-Zugang setzen,
+dann php tests/promotions.php ausführen. Der Test entfernt nur eigene Fixtures.

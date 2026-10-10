@@ -1,84 +1,42 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de">
-<head>
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<meta http-equiv="Content-Type" content="text/html;  charset=iso-8859-1" />
-	<meta name="description" content="An minimal site format" />
-	<meta name="keywords" content="blog" />
- <link rel="stylesheet" type="text/css" href="css/start.css" media="all" />  
-<title>CSA - Staff Area</title>
-</head>
-
-<body>
-   <div id="container">
-   
-        
-
-        <div id="header"><span class="brand-mark">CSA</span><div><h1>CYBERFORCE SECURITY AGENCY</h1><p>Dein Jobcenter im Habbo Hotel</p></div></div>
-
-      <div id="wrapper">
-
-        <div id="navigation">
-           <ul>
-                <li class="current_page_item"><a href="start.php" aria-current="page">Dashboard</a></li>
-                <li><a href="news.php">News</a></li>
-                <li><a href="rangliste.php">Rangliste</a></li>
-                <li><a href="sonstiges.php">Sonstiges</a></li>
-                <li><a href="ranks.php">F&uuml;hrungsebene</a></li>
-                <li><a href="http://r63.de.vu">BF TOOL</a></li>
-           </ul>
-        </div>
-        
-
-      
-        <div id="content-wrapper">
-            <div class="dashboard-welcome">
-                <span class="eyebrow">CSA Staff Area</span>
-                <h2>Willkommen im Dashboard!</h2>
-                <p>Dein Einstieg in die CSA: Neuigkeiten, Karriere und Team auf einen Blick.</p>
-            </div>
-            <div class="dashboard-cards">
-                <a class="dashboard-card" href="news.php"><strong>News</strong><span>Alles Neue aus der Agency &rarr;</span></a>
-                <a class="dashboard-card" href="rangliste.php"><strong>Rangliste</strong><span>Dein Weg nach oben &rarr;</span></a>
-                <a class="dashboard-card" href="ranks.php"><strong>Unser Team</strong><span>Die F&uuml;hrungsebene &rarr;</span></a>
-            </div>
-            <div id="content">
-                <h3 class="post-title"><a href="#">Die Idee</a></h3>
-                <p>Alle von uns haben bereits in verschiedenen Jobcentern gearbeitet und fanden immer mehr Anstosspunkte, die die Arbeit dort nicht mehr lohnenswert machten.
-Daher er&ouml;ffnen wir jetzt unser eigenes Center! Wir haben wochenlang Herzblut und viel Arbeit reingesteckt, um unseren Mitarbeitern ein besseres Jobcenter als alle anderen im Habbo Hotel zu bieten.
-
-Wenn ihr uns unterst&uuml;tzen wollt, scheut euch nicht, uns beizutreten. Jedes Mitglied wird mit Respekt und Freundlichkeit behandelt, jeder unserer Mitarbeiter ist jederzeit hilfsbereit und beantwortet Fragen.</p>
-<div class="commentbox">Euer CSA Team</div>
-                              
-			 <br>
-               
-		
-		
-	
-		        	
-	
-	
-        </div>
-
-         
-        </div>
-        
-        <div id="sidebar-wrapper">
-          <div id="sidebar">
-           <h3>Mitarbeiter</h3>
-           <ul id="sidenotes">
-                <li><a href="https://www.r63.de.vu">BF Tool</a></li>
-                <li><a href="#">zur CSA</a></li>
-           </ul>
-          </div> 
-        </div>
-        
-        <div id="footer">(!): CyberForce Security Agency (c) copyright by RockerFlippy, Painetik, Shahrukh008 & Lordblekkinator. Alle Rechte vorbehalten. Dieses Unternehmen handelt nicht mit echtem Geld (wie z.B. PaySafeCard), sondern nur mit Talern (oder anderen Habbogeldmittel). Wir arbeiten im Habbo-Hotel, ohne Hilfe des DE-Teams. Anmelden</div>
-        
-      </div> 
-      
-   </div>
-</body>
-
-</html>
+<?php
+require_once __DIR__ . '/layout.php';
+$user = require_login();
+synchronize_user($user['id']);
+$user = current_user();
+$stats = service_query('SELECT COUNT(*) AS members, SUM(active_since IS NOT NULL) AS active FROM users')->fetch();
+page_header('Dashboard', $user);
+?>
+<section class="welcome">
+    <span class="eyebrow">Gemeinsam weiterkommen</span>
+    <h2>Willkommen zurück, <?= h($user['username']) ?>!</h2>
+    <p>Dein Dienst, deine Karriere und dein Team – alles an einem Ort.</p>
+</section>
+<div class="stats">
+    <section class="card"><span>Mitarbeiter gesamt</span><strong><?= (int) $stats['members'] ?></strong></section>
+    <section class="card"><span>Im Dienst</span><strong><?= (int) $stats['active'] ?></strong></section>
+    <section class="card"><span>Dein Rang</span><strong class="rank-name"><?= h(rank_label($user)) ?></strong></section>
+</div>
+<div class="two-columns">
+    <section class="card">
+        <h2>Dein Dienst</h2>
+        <p><span class="badge"><?= $user['active_since'] !== null ? 'Angemeldet · Zeit läuft' : 'Abgemeldet · Zeit pausiert' ?></span></p>
+        <p>Nur angemeldete Dienstzeit zählt. Restzeiten bleiben bei jeder Abmeldung erhalten.</p>
+        <?php action_form($user['id'], $user['active_since'] === null ? 'start' : 'stop', $user['active_since'] === null ? 'Zum Dienst anmelden' : 'Vom Dienst abmelden'); ?>
+        <p><small>Konto-Login und Dienstanmeldung sind getrennt. Auch die Führung kann deinen Dienst verwalten.</small></p>
+    </section>
+    <section class="card">
+        <h2>Nächste Beförderung</h2>
+        <?php if (next_rank($user)): ?>
+            <p><?= h(rank_label(next_rank($user))) ?></p>
+            <progress max="3600" value="<?= min(3600, (int) $user['promotion_seconds']) ?>"></progress>
+            <p><?= (int) floor($user['promotion_seconds'] / 60) ?> Minuten verfügbar · je 60 Minuten eine Beförderung</p>
+            <p>Jede Beförderung wird einzeln bestätigt. Intel durchläuft 0/10 bis 10/10.</p>
+        <?php else: ?>
+            <p>Automatisches Karriereziel erreicht. Führungsränge werden durch die Administration vergeben.</p>
+        <?php endif; ?>
+    </section>
+</div>
+<?php if (can_manage($user)): ?>
+<section class="card"><h2>Dein Führungsbereich</h2><p>Dienstzeiten verwalten, Beförderungen bestätigen und das Protokoll prüfen.</p><a class="button" href="bf.php">BF-Panel öffnen</a> <a class="button secondary" href="hours.php">Stundenübersicht</a></section>
+<?php endif; ?>
+<?php page_footer(); ?>

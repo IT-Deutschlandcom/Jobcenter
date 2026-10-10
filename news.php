@@ -1,45 +1,16 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de">
-<head>
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<meta http-equiv="Content-Type" content="text/html;  charset=iso-8859-1" />
-	<meta name="description" content="An minimal site format" />
-	<meta name="keywords" content="blog" />
- <link rel="stylesheet" type="text/css" href="css/start.css" media="all" />  
-<title>CSA - Staff Area</title>
-</head>
-
-<body>
-   <div id="container">
-   
-        
-
-        <div id="header"><span class="brand-mark">CSA</span><div><h1>CYBERFORCE SECURITY AGENCY</h1><p>Dein Jobcenter im Habbo Hotel</p></div></div>
-
-      <div id="wrapper">
-
-        <div id="navigation">
-           <ul>
-                <li><a href="start.php">Dashboard</a></li>
-                <li class="current_page_item"><a href="news.php" aria-current="page">News</a></li>
-                <li><a href="rangliste.php">Rangliste</a></li>
-                <li><a href="sonstiges.php">Sonstiges</a></li>
-                <li><a href="ranks.php">F&uuml;hrungsebene</a></li>
-           </ul>
-        </div>
-        
-
-      
-        <div id="content-wrapper">
-            <div id="content">
+<?php
+require_once __DIR__ . '/layout.php';
+$user = require_login();
+page_header('News', $user);
+?>
+            <section class="card">
                 <h3 class="post-title"><a href="#">News</a></h3>
 				<blockquote><p style="text-align: center;" data-mce-style="text-align: center;">
-    Nach langer Planung und Strukturierung der CyberForce Security Agency
+    Nach langer Planung und Strukturierung von Europol
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
-    er&ouml;ffnete die CSA am 01.03.2015 ihre Tore. Wir haben wochenlang viel
+    er&ouml;ffnete unser Jobcenter am 01.03.2015 seine Tore. Wir haben wochenlang viel
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
@@ -59,7 +30,7 @@
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
-    Trete noch heute der CyberForce Security Agency bei und schreibe
+    Trete noch heute EURO bei und schreibe
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
@@ -83,11 +54,11 @@
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
-    90 Minuten Arbeitszeit f&uuml;r eine Bef&ouml;rderung
+    60 Minuten angemeldete Dienstzeit f&uuml;r eine best&auml;tigte Bef&ouml;rderung
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
-    Jeden 2. Sonntag ist Double Sunday, an diesem Tag kann man 2 Bef&ouml;rderungen erlangen.
+    Restzeiten werden gespeichert. Jede volle Stunde wird einzeln durch die F&uuml;hrung best&auml;tigt.
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
@@ -111,8 +82,8 @@
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
-    <b>Euer CyberForce Security Agency Management!</b></p></blockquote>
-                </div>
+    <b>Euer EURO Management!</b></p></blockquote>
+                </section>
                               
 			 <br>
                
@@ -122,17 +93,4 @@
 		        	
 	
 	
-        </div>
-
-         
-        </div>
-        
-        
-        <div id="footer">(!): CyberForce Security Agency (c) copyright by RockerFlippy, Painetik, Shahrukh008 & Lordblekkinator. Alle Rechte vorbehalten. Dieses Unternehmen handelt nicht mit echtem Geld (wie z.B. PaySafeCard), sondern nur mit Talern (oder anderen Habbogeldmittel). Wir arbeiten im Habbo-Hotel, ohne Hilfe des DE-Teams. Anmelden</div>
-        
-      </div> 
-      
-   </div>
-</body>
-
-</html>
+<?php page_footer(); ?>

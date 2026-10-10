@@ -1,12 +1,41 @@
--- 
--- Table structure for table `users`
--- 
+CREATE TABLE users (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    avatar TEXT NOT NULL,
+    signup_date BIGINT NOT NULL,
+    rank_id INT NOT NULL DEFAULT 1,
+    rank_step TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    total_seconds BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    promotion_seconds BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    active_since BIGINT DEFAULT NULL,
+    active_by BIGINT UNSIGNED DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE `users` (
-  `id` bigint(20) NOT NULL,
-  `username` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `avatar` text NOT NULL,
-  `signup_date` int(10) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+CREATE TABLE promotions (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
+    from_rank INT NOT NULL,
+    from_step TINYINT UNSIGNED NOT NULL,
+    to_rank INT NOT NULL,
+    to_step TINYINT UNSIGNED NOT NULL,
+    created_by BIGINT UNSIGNED NOT NULL,
+    created_at BIGINT NOT NULL,
+    confirmed_by BIGINT UNSIGNED DEFAULT NULL,
+    confirmed_at BIGINT DEFAULT NULL,
+    INDEX pending (user_id, confirmed_at),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (created_by) REFERENCES users(id),
+    FOREIGN KEY (confirmed_by) REFERENCES users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE duty_log (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
+    actor_id BIGINT UNSIGNED NOT NULL,
+    action VARCHAR(20) NOT NULL,
+    happened_at BIGINT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (actor_id) REFERENCES users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
