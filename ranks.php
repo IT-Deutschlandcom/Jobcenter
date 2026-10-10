@@ -1,39 +1,21 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de">
-<head>
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<meta http-equiv="Content-Type" content="text/html;  charset=iso-8859-1" />
-	<meta name="description" content="An minimal site format" />
-	<meta name="keywords" content="blog" />
- <link rel="stylesheet" type="text/css" href="css/start.css" media="all" />  
-<title>CSA - Staff Area</title>
-</head>
-
-<body>
-   <div id="container">
-   
-        
-
-        <div id="header"><span class="brand-mark">CSA</span><div><h1>CYBERFORCE SECURITY AGENCY</h1><p>Dein Jobcenter im Habbo Hotel</p></div></div>
-
-      <div id="wrapper">
-
-        <div id="navigation">
-           <ul>
-                <li><a href="start.php">Dashboard</a></li>
-                <li><a href="news.php">News</a></li>
-                <li><a href="rangliste.php">Rangliste</a></li>
-                <li><a href="sonstiges.php">Sonstiges</a></li>
-                <li class="current_page_item"><a href="ranks.php" aria-current="page">F&uuml;hrungsebene</a></li>
-           </ul>
-        </div>
-        
-
-      
-        <div id="content-wrapper">
-            <div id="content">
-                <h3 class="post-title"><a href="#">Sonstiges</a></h3><br />
+<?php
+require_once __DIR__ . '/layout.php';
+$user = require_login();
+page_header('Führungsebene', $user);
+$leaders = service_query('SELECT username, rank_id, rank_step FROM users WHERE rank_id >= 50 ORDER BY rank_id DESC, username')->fetchAll();
+?>
+<section class="card">
+    <h2>Aktuelle Führung</h2>
+    <div class="table-scroll"><table><thead><tr><th>Mitarbeiter</th><th>Rang</th></tr></thead><tbody>
+    <?php foreach ($leaders as $leader): ?>
+        <tr><td><?= h($leader['username']) ?></td><td><?= h(rank_label($leader)) ?></td></tr>
+    <?php endforeach; ?>
+    <?php if (!$leaders): ?><tr><td colspan="2">Noch keine Führungskraft ernannt.</td></tr><?php endif; ?>
+    </tbody></table></div>
+</section>
+<section class="card">
+    <h2>Historisches Team</h2>
+    <p>Die folgende Liste stammt aus dem bisherigen Jobcenter. Maßgeblich für BF-Rechte ist ausschließlich der aktuelle Kontorang.</p>
 			    <div id="cc-matrix-3201134325"><div id="cc-m-11656359825" class="n j-text"><p style="text-align: center;" data-mce-style="text-align: center;">
     <span style="font-size: 24px;" data-mce-style="font-size: 24px;">[-Ministerium-]</span>
 </p>
@@ -43,7 +25,7 @@
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
-    RockerFlippy : Minister of CSA
+    RockerFlippy : Minister of EURO
 </p>
 
 <p style="text-align: center;" data-mce-style="text-align: center;">
@@ -281,7 +263,7 @@
 <p style="text-align: center;" data-mce-style="text-align: center;">
      <br/>
 </p></div></div>
-                </div>
+                </section>
                               
 			 <br>
                
@@ -291,17 +273,4 @@
 		        	
 	
 	
-        </div>
-
-         
-        </div>
-        
-        
-        <div id="footer">(!): CyberForce Security Agency (c) copyright by RockerFlippy, Painetik, Shahrukh008 & Lordblekkinator. Alle Rechte vorbehalten. Dieses Unternehmen handelt nicht mit echtem Geld (wie z.B. PaySafeCard), sondern nur mit Talern (oder anderen Habbogeldmittel). Wir arbeiten im Habbo-Hotel, ohne Hilfe des DE-Teams. Anmelden</div>
-        
-      </div> 
-      
-   </div>
-</body>
-
-</html>
+<?php page_footer(); ?>
