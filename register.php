@@ -2,43 +2,41 @@
 include('config.php');
 ?>
 <!DOCTYPE html>
-<html>
-
+<html lang="de">
 <head>
-
-  <meta charset="UTF-8">
-
-  <title>CSA - Staff</title>
-  <link rel="stylesheet" type="text/css" href="css/style.css">
-
-    <script src="js/prefixfree.min.js"></script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CSA - Registrierung</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
-
 <body>
-
-
-<div id="alert"><b>Meldung:</b> An alle BFtoolnutzer ohne Gruppenmitgliedschaft! Bitte stellt eine Gruppenanfrage, zur Hilfe gibts hier ein kleines Video. <a href="#" class="link" title="2,8 MB groß">Download</a><div id="x"><a href="#" class="x">&nbsp;Registrieren&nbsp;</a></div></div>
-  <div class="body"></div>
-		<div class="grad"></div>
-		<div class="header">
-			<div><img id="cc-m-imagesubtitle-image-11331278025" src="http://u.jimdo.com/www71/o/s2db6a28250e267bc/img/ic8753465714960b3/1424941870/std/image.png" alt="" title="" class="" data-src-width="750" data-src-height="749"></div>
-		</div>
-		<br>
-		<div class="login">
-		<form action="sign_up.php" method="post">
-            <input type="text" name="username" placeholder="Benutzername" /><br />
-            <input type="password" name="password" placeholder="Passwort" /><br />
-            <input type="password" name="passverif" placeholder="Passwort" /><br /><br />
-            <input type="text" name="email" placeholder="Email Adresse" /><br /><br />
-            <input type="text" name="avatar" placeholder="Avatar (nicht n&ouml;tig)" /><br />
-            <input type="submit" value="Sign up" />
-		</div>
-    </form>
-		</div>
-
-  <script src='http://codepen.io/assets/libs/fullpage/jquery.js'></script>
-
+    <div id="alert"><b>Hinweis:</b> BF-Toolnutzer ohne Gruppenmitgliedschaft: Bitte stellt eine Gruppenanfrage! <div id="x"><a href="index.php">Anmelden</a></div></div>
+    <main class="auth-shell">
+        <section class="auth-intro">
+            <span class="brand-mark">CSA</span>
+            <span class="eyebrow">CyberForce Security Agency</span>
+            <h1>Deine Karriere<br>beginnt hier.</h1>
+            <p>Werde Teil unseres Jobcenters im Habbo Hotel. Erstelle dein CSA-Konto und entdecke unser Team und deine Aufstiegsm&ouml;glichkeiten.</p>
+            <a href="start.php">Zum Dashboard &rarr;</a>
+        </section>
+        <section class="login" aria-labelledby="register-title">
+            <span class="eyebrow">Neu in der Agency?</span>
+            <h2 id="register-title">Konto erstellen</h2>
+            <form action="sign_up.php" method="post">
+                <label for="username">Benutzername</label>
+                <input type="text" name="username" id="username" autocomplete="username" placeholder="Dein Benutzername">
+                <label for="password">Passwort</label>
+                <input type="password" name="password" id="password" autocomplete="new-password" placeholder="Dein Passwort">
+                <label for="passverif">Passwort best&auml;tigen</label>
+                <input type="password" name="passverif" id="passverif" autocomplete="new-password" placeholder="Passwort wiederholen">
+                <label for="email">E-Mail-Adresse</label>
+                <input type="text" name="email" id="email" autocomplete="email" placeholder="Deine E-Mail-Adresse">
+                <label for="avatar">Avatar <small>(optional)</small></label>
+                <input type="text" name="avatar" id="avatar" placeholder="URL zu deinem Avatar">
+                <input type="submit" value="Registrieren">
+            </form>
+            <p>Bereits dabei? <a href="index.php">Zur Anmeldung</a></p>
+        </section>
+    </main>
 </body>
-
 </html>
