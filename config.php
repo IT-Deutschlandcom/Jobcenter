@@ -9,7 +9,7 @@ can work correctly.
 ******************************************************/
 
 //We log to the DataBase
-mysql_connect('localhost', 'root', '1234');
+mysql_connect('localhost', 'root', 'TheReal1337!');
 mysql_select_db('csa');
 
 //Webmaster Email

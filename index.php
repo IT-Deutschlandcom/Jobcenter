@@ -32,7 +32,10 @@ include('config.php');
             <input type="submit" value="Log in" />
 		</div>
     </form>
+
+    
 		</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
   <script src='http://codepen.io/assets/libs/fullpage/jquery.js'></script>
 
