@@ -2,16 +2,60 @@
 require_once __DIR__ . '/layout.php';
 $user = require_login();
 page_header('Führungsebene', $user);
-$leaders = service_query('SELECT username, rank_id, rank_step FROM users WHERE rank_id >= 50 ORDER BY rank_id DESC, username')->fetchAll();
+$ranks = rank_catalog();
+$membersByRank = array_fill_keys(array_keys($ranks), []);
+$members = service_query('SELECT username, rank_id, rank_step FROM users ORDER BY rank_id, username')->fetchAll();
+foreach ($members as $member) {
+    $rankId = (int) $member['rank_id'];
+    if (isset($membersByRank[$rankId])) {
+        $membersByRank[$rankId][] = $member;
+    }
+}
+$divisions = [
+    'TAC' => ['label' => 'Tactical Division', 'image' => 'https://github.com/user-attachments/assets/1fc15267-4a99-425d-9c37-dfa9dc3099d0'],
+    'Intel' => ['label' => 'Intelligence Division', 'image' => 'https://github.com/user-attachments/assets/b3ec7c79-875f-44cb-9d30-f90f37b3abaa'],
+    'Leadership' => ['label' => 'Division Leadership', 'image' => 'https://github.com/user-attachments/assets/3dc8cd4a-c14e-4445-b9f6-6ca9d3c46fb3'],
+];
 ?>
 <section class="card">
-    <h2>Aktuelle Führung</h2>
-    <div class="table-scroll"><table><thead><tr><th>Mitarbeiter</th><th>Rang</th></tr></thead><tbody>
-    <?php foreach ($leaders as $leader): ?>
-        <tr><td><?= h($leader['username']) ?></td><td><?= h(rank_label($leader)) ?></td></tr>
-    <?php endforeach; ?>
-    <?php if (!$leaders): ?><tr><td colspan="2">Noch keine Führungskraft ernannt.</td></tr><?php endif; ?>
-    </tbody></table></div>
+    <h2>Aktuelle Führung und Mitarbeiter</h2>
+    <div class="division-list">
+        <?php foreach ($divisions as $division => $details): ?>
+            <section class="division-card" aria-labelledby="division-<?= h(strtolower($division)) ?>">
+                <h3 class="division-heading" id="division-<?= h(strtolower($division)) ?>">
+                    <img src="<?= h($details['image']) ?>" alt="" width="40" height="40">
+                    <?= h($details['label']) ?>
+                </h3>
+                <?php foreach ($ranks as $rankId => $rank): ?>
+                    <?php if ($rank['division'] !== $division) { continue; } ?>
+                    <section class="rank-group" aria-label="<?= h($rank['name']) ?>">
+                        <h4><?= (int) $rankId ?>. <?= h($rank['name']) ?><?= $rank['steps'] ? ' · 0/10–10/10' : '' ?></h4>
+                        <?php if ($membersByRank[$rankId]): ?>
+                            <ul class="member-list">
+                                <?php foreach ($membersByRank[$rankId] as $member): ?>
+                                    <li class="member-card">
+                                        <img
+                                            class="member-avatar"
+                                            src="https://www.habbo.de/habbo-imaging/avatarimage?headonly=1&amp;head_direction=2&amp;gesture=std&amp;size=l&amp;user=<?= rawurlencode($member['username']) ?>"
+                                            alt=""
+                                            width="48"
+                                            height="48"
+                                            loading="lazy">
+                                        <span class="member-details">
+                                            <strong><?= h($member['username']) ?></strong>
+                                            <span><?= h(rank_label($member)) ?></span>
+                                        </span>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php else: ?>
+                            <p class="empty-rank">Noch keine Mitarbeiter in diesem Rang.</p>
+                        <?php endif; ?>
+                    </section>
+                <?php endforeach; ?>
+            </section>
+        <?php endforeach; ?>
+    </div>
 </section>
 <section class="card">
     <h2>Historisches Team</h2>
