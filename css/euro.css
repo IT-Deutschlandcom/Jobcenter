@@ -68,7 +68,7 @@ dialog { border: 0; border-radius: 18px; padding: 32px; width: min(540px, 90vw);
 dialog::backdrop { background: #14213899; backdrop-filter: blur(3px); }
 dialog li { margin: 12px 0; }
 label { display: block; margin: 12px 0 6px; }
-input:not([type="hidden"]) { width: 100%; padding: 10px; border: 1px solid #c9d3e1; border-radius: 7px; }
+input:not([type="hidden"]):not([type="checkbox"]) { width: 100%; padding: 10px; border: 1px solid #c9d3e1; border-radius: 7px; }
 @media (max-width: 900px) {
     .app-shell { grid-template-columns: 1fr; }
     .sidebar { padding: 18px; }

@@ -87,8 +87,11 @@ function duty_action($actorId, $targetId, $action, $promotionId = 0)
         if (!$actor || !$user) {
             throw new DomainException('Benutzer nicht gefunden.');
         }
-        if ($action === 'confirm' ? !can_manage($actor) : ($actorId != $targetId && !can_manage($actor))) {
+        if (!can_manage($actor) && !($action === 'stop' && $actorId == $targetId)) {
             throw new DomainException('Keine Berechtigung für diese Aktion.');
+        }
+        if ($action === 'start' && $actorId == $targetId) {
+            throw new DomainException('Selbsteintragungen sind nicht erlaubt. Bitte eine andere Führungskraft um Dienstanmeldung.');
         }
         $now = time();
         accrue_time($user, $now);
