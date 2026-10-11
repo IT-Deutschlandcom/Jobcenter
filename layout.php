@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/promotion_service.php';
+require_once __DIR__ . '/payroll_service.php';
 
 function page_header($title, $user)
 {
@@ -20,11 +20,15 @@ function page_header($title, $user)
         <nav aria-label="Hauptnavigation">
             <?php
             $links = ['start.php' => 'Dashboard', 'profile.php?id=' . $user['id'] => 'Mein Profil',
+                'hours.php' => 'Meine Stunden & Lohn',
                 'rangliste.php' => 'Ränge & Karriere', 'news.php' => 'News', 'ranks.php' => 'Führungsebene',
                 'sonstiges.php' => 'Handbuch'];
             if (can_manage($user)) {
                 $links['bf.php'] = 'BF-Panel';
                 $links['hours.php'] = 'Gesammelte Stunden';
+            }
+            if (can_view_payroll($user)) {
+                $links['payroll.php'] = 'Director · Lohnverwaltung';
             }
             foreach ($links as $url => $label) {
                 $active = basename($_SERVER['SCRIPT_NAME']) === strtok($url, '?');
@@ -50,7 +54,7 @@ function page_header($title, $user)
 function promotion_popup()
 {
     ?>
-<dialog id="promotion-popup" aria-labelledby="promotion-title">
+<dialog id="promotion-popup" aria-labelledby="promotion-title" data-csrf="<?= h(csrf_token()) ?>">
     <span class="eyebrow">Karriere-Update</span>
     <h2 id="promotion-title">Beförderungszeit!</h2>
     <p>Eine volle Dienststunde ist erreicht. Die Beförderung wartet auf Bestätigung durch die Führung.</p>

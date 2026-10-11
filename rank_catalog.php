@@ -49,6 +49,11 @@ function can_manage($user)
     return $user && (int) $user['rank_id'] >= 50;
 }
 
+function can_view_payroll($user)
+{
+    return $user && (int) $user['rank_id'] >= 55;
+}
+
 function next_rank($user)
 {
     $id = (int) $user['rank_id'];

@@ -6,7 +6,9 @@ Der Webserver muss PHP-Dateien ausführen, nicht als Quelltext ausliefern.
 Datenbank
 1. Backup der bestehenden Datenbank erstellen.
 2. Neuinstallation: users.sql in eine leere MySQL-Datenbank importieren.
-   Bestehende Installation: nur migration_euro.sql einmalig importieren.
+   Bestehende Legacy-Installation: migration_euro.sql und danach migration_payroll.sql
+   jeweils einmalig importieren. Bei bereits installiertem EURO nur migration_payroll.sql.
+   Neuinstallationen benötigen keine Migrationen.
    Doppelte IDs/Benutzernamen vor der Migration bereinigen. Die bisherigen
    Benutzer erhalten Rang 1, Stufe 0 und keine Dienstzeiten.
 3. Umgebungsvariablen für Webserver UND Cron setzen:
@@ -33,13 +35,18 @@ folgt mit einer weiteren Stunde der nächste Rang bei 0/10.
 Rang 49: Europol Elite 10/10, automatisches Karriereziel. Rang 50 Squad Leader und
 weitere Führungsränge werden administrativ vergeben, nicht durch Dienststunden.
 Ab Rang 50: BF-Panel, andere Mitarbeiter an-/abmelden, Vorschläge bestätigen,
-Stundenübersicht und Protokolle. Selbstbeförderungen sind gesperrt.
-Normale Mitglieder können nur ihren eigenen Dienst an-/abmelden und sehen
-nur eigene Beförderungshinweise, nicht die Stundenübersicht anderer Nutzer.
+Stundenübersicht und Protokolle. Selbstbeförderungen und Selbsteintragungen
+sind für alle Ränge gesperrt.
+Alle Mitglieder können ihren laufenden Dienst selbst beenden, sehen eigene
+Stunden und Lohnstände im Dashboard und in der Stundenübersicht sowie eigene
+Beförderungshinweise. Stunden anderer Nutzer sind erst ab Squad Leader sichtbar.
+Ab Rang 55 Director: zusätzlich geschütztes Lohnpanel mit Lohnständen aller
+Mitarbeiter, offenem Gesamtlohn, Dienststatus und Auszahlungsprotokoll.
 
 Zeiterfassung
 Konto-Login und Dienst sind getrennt. Browser schließen beendet den Dienst
 nicht; explizit vom Dienst abmelden. Konto-Logout beendet den eigenen Dienst.
+Die Dienstanmeldung muss eine andere Führungskraft ab Squad Leader vornehmen.
 Gesamtzeit und verbrauchbares Beförderungsguthaben sind getrennt. Restsekunden
 bleiben erhalten. Dienstanmeldungen, Abmeldungen, Ersteller/Dienstanmelder und
 Bestätiger werden dauerhaft protokolliert. Automatische Vorschläge werden der
@@ -50,7 +57,22 @@ wenn weiterhin genügend Guthaben vorhanden ist.
 Alle CMS-Seiten prüfen alle 15 Sekunden; bei neuem Vorschlag bzw. weiterer
 voller Stunde erscheint ein Popup. Ein geschlossener Browser kann keine
 Popups anzeigen; beim nächsten Seitenaufruf werden offene Vorschläge angezeigt.
+Alle Führungskräfte ab Squad Leader erhalten Hinweise für offene Beförderungen
+und können diese direkt im Popup oder im BF-Panel bestätigen.
 Uhrzeiten im Protokoll verwenden die PHP-Serverzeitzone.
+
+Lohn
+4 Taler pro voller unbezahlter Stunde über alle Dienste; Restsekunden bleiben
+erhalten. Beförderungsguthaben und Lohn sind unabhängig voneinander.
+Das Dashboard aktualisiert eigene Gesamtstunden und Lohnstände alle 15 Sekunden.
+Director-Ränge protokollieren die Auszahlung nach tatsächlicher Talerübergabe.
+Es erfolgt keine automatische Habbo-Überweisung. Ein fester Lohntag ist nicht
+vorgegeben; angezeigt wird der aktuell auszahlbare Betrag, nicht eine Prognose
+zukünftiger Dienste. Die tatsächlichen Auszahlungstage bestimmt die Führung.
+Auszahlungen sind transaktional, mit Bestätiger und Zeitpunkt protokolliert.
+Veraltete Formulare werden abgelehnt; Stunden werden nicht doppelt bezahlt.
+Bestehende Dienstzeiten gelten nach der Lohnmigration zunächst als unbezahlt;
+bereits erfolgte historische Auszahlungen vor Nutzung administrativ abgleichen.
 
 Sicherheit
 Passwörter werden gehasht, SQL-Abfragen parametrisiert und schreibende Aktionen

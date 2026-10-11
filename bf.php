@@ -26,7 +26,7 @@ page_header('BF-Panel', $user);
     <h2>Dienstverwaltung</h2>
     <div class="table-scroll"><table><thead><tr><th>Mitarbeiter</th><th>Rang</th><th>Status</th><th>Dienst</th></tr></thead><tbody>
     <?php foreach ($members as $member): ?>
-        <tr><td><?= h($member['username']) ?></td><td><?= h(rank_label($member)) ?></td><td><span class="badge"><?= $member['active_since'] === null ? 'Abgemeldet' : 'Angemeldet' ?></span></td><td><?php action_form($member['id'], $member['active_since'] === null ? 'start' : 'stop', $member['active_since'] === null ? 'Anmelden' : 'Abmelden'); ?></td></tr>
+        <tr><td><?= h($member['username']) ?></td><td><?= h(rank_label($member)) ?></td><td><span class="badge"><?= $member['active_since'] === null ? 'Abgemeldet' : 'Angemeldet' ?></span></td><td><?php if ($member['id'] == $user['id'] && $member['active_since'] === null) { echo 'Andere Führungskraft erforderlich'; } else { action_form($member['id'], $member['active_since'] === null ? 'start' : 'stop', $member['active_since'] === null ? 'Anmelden' : 'Abmelden'); } ?></td></tr>
     <?php endforeach; ?>
     </tbody></table></div>
 </section>
