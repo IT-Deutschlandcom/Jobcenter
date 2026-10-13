@@ -58,9 +58,9 @@ function payroll_period_summary($periodId, $userId = null)
     }
     $rows = service_query($sql . ' ORDER BY u.username', $params)->fetchAll();
     foreach ($rows as &$row) {
-        $finalSeconds = $period['ended_at'] === null
-            ? (int) $row['total_seconds'] + earned_seconds($row, time())
-            : (int) $row['final_total_seconds'];
+        $finalSeconds = $row['final_total_seconds'] !== null
+            ? (int) $row['final_total_seconds']
+            : (int) $row['total_seconds'] + earned_seconds($row, time());
         $row['period_seconds'] = max(0, $finalSeconds - (int) $row['baseline_seconds']);
         $row['unpaid_seconds'] = max(0, $row['period_seconds'] + (int) $row['adjustment_seconds'] - (int) $row['paid_seconds']);
         $row['payable_hours'] = intdiv($row['unpaid_seconds'], PROMOTION_INTERVAL);
@@ -88,7 +88,14 @@ function start_payroll_period($actorId, $rankId)
     synchronize_visible_users($actor);
     db()->beginTransaction();
     try {
-        $currentActor = service_query('SELECT * FROM users WHERE id = ? FOR UPDATE', [(int) $actorId])->fetch();
+        $memberIds = service_query('SELECT id FROM users WHERE rank_id = ? ORDER BY id', [$rankId])->fetchAll(PDO::FETCH_COLUMN);
+        $ids = array_unique(array_merge([(int) $actorId], array_map('intval', $memberIds)));
+        sort($ids);
+        $locked = [];
+        foreach ($ids as $id) {
+            $locked[$id] = service_query('SELECT * FROM users WHERE id = ? FOR UPDATE', [$id])->fetch();
+        }
+        $currentActor = $locked[$actorId] ?? null;
         if (!$currentActor || !can_manage_payroll_periods($currentActor)) {
             throw new DomainException('Lohnperioden dürfen erst ab Rang 65 verwaltet werden.');
         }
@@ -99,8 +106,11 @@ function start_payroll_period($actorId, $rankId)
         service_query('INSERT INTO payroll_periods (rank_id, started_by, started_at) VALUES (?, ?, ?)',
             [$rankId, (int) $actorId, $startedAt]);
         $periodId = (int) db()->lastInsertId();
-        $members = service_query('SELECT id, total_seconds FROM users WHERE rank_id = ? ORDER BY id', [$rankId])->fetchAll();
-        foreach ($members as $member) {
+        foreach ($memberIds as $memberId) {
+            $member = $locked[$memberId] ?? null;
+            if (!$member || (int) $member['rank_id'] !== $rankId) {
+                continue;
+            }
             service_query('INSERT INTO payroll_period_members (period_id, user_id, baseline_seconds) VALUES (?, ?, ?)',
                 [$periodId, $member['id'], $member['total_seconds']]);
         }
@@ -135,7 +145,7 @@ function end_payroll_period($actorId, $periodId)
         $members = service_query('SELECT m.user_id, u.total_seconds FROM payroll_period_members m JOIN users u ON u.id = m.user_id WHERE m.period_id = ?',
             [(int) $periodId])->fetchAll();
         foreach ($members as $member) {
-            service_query('UPDATE payroll_period_members SET final_total_seconds = ? WHERE period_id = ? AND user_id = ?',
+            service_query('UPDATE payroll_period_members SET final_total_seconds = ? WHERE period_id = ? AND user_id = ? AND final_total_seconds IS NULL',
                 [$member['total_seconds'], (int) $periodId, $member['user_id']]);
         }
         service_query('UPDATE payroll_periods SET ended_by = ?, ended_at = ? WHERE id = ?',

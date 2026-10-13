@@ -1,5 +1,7 @@
 -- Einmalig nach migration_payroll.sql auf bereits installierten Systemen ausführen.
 -- Vorher ein Datenbank-Backup erstellen.
+ALTER TABLE users ADD INDEX rank_id_idx (rank_id);
+
 CREATE TABLE payroll_periods (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     rank_id INT NOT NULL,
@@ -30,6 +32,7 @@ CREATE TABLE payroll_adjustments (
     period_id BIGINT UNSIGNED NOT NULL,
     user_id BIGINT UNSIGNED NOT NULL,
     actor_id BIGINT UNSIGNED NOT NULL,
+    duty_action VARCHAR(10) NOT NULL,
     adjustment_seconds INT NOT NULL,
     created_at BIGINT NOT NULL,
     FOREIGN KEY (period_id, user_id) REFERENCES payroll_period_members(period_id, user_id),

@@ -12,12 +12,12 @@ foreach ($members as $member) {
     }
 }
 $divisions = [
-    'Intel' => ['label' => 'Intelligence Division', 'image' => 'https://github.com/user-attachments/assets/b3ec7c79-875f-44cb-9d30-f90f37b3abaa'],
-    'INV' => ['label' => 'Investigation Division · INV-01 Criminal Investigation Unit', 'image' => 'https://github.com/user-attachments/assets/1fc15267-4a99-425d-9c37-dfa9dc3099d0'],
-    'TAC' => ['label' => 'Tactical Division · TAC-01 Patrol & Response Unit', 'image' => 'https://github.com/user-attachments/assets/1fc15267-4a99-425d-9c37-dfa9dc3099d0'],
-    'Unit Leadership' => ['label' => 'Unit Leadership · TAC-CMD / INT-CMD / INV-CMD', 'image' => 'https://github.com/user-attachments/assets/3dc8cd4a-c14e-4445-b9f6-6ca9d3c46fb3'],
-    'Division Leadership' => ['label' => 'Division Leadership · CMD-01 Command Division', 'image' => 'https://github.com/user-attachments/assets/3dc8cd4a-c14e-4445-b9f6-6ca9d3c46fb3'],
     'High Command' => ['label' => 'High Command · CMD-02 High Command', 'image' => 'https://github.com/user-attachments/assets/3dc8cd4a-c14e-4445-b9f6-6ca9d3c46fb3'],
+    'Division Leadership' => ['label' => 'Division Leadership · CMD-01 Command Division', 'image' => 'https://github.com/user-attachments/assets/3dc8cd4a-c14e-4445-b9f6-6ca9d3c46fb3'],
+    'Unit Leadership' => ['label' => 'Unit Leadership · TAC-CMD / INT-CMD / INV-CMD', 'image' => 'https://github.com/user-attachments/assets/3dc8cd4a-c14e-4445-b9f6-6ca9d3c46fb3'],
+    'INV' => ['label' => 'Investigation Division · INV-01 Criminal Investigation Unit', 'image' => 'https://github.com/user-attachments/assets/1fc15267-4a99-425d-9c37-dfa9dc3099d0'],
+    'Intel' => ['label' => 'Intelligence Division · INT-01 Intelligence & Surveillance Unit', 'image' => 'https://github.com/user-attachments/assets/b3ec7c79-875f-44cb-9d30-f90f37b3abaa'],
+    'TAC' => ['label' => 'Tactical Division · TAC-01 Patrol & Response Unit', 'image' => 'https://github.com/user-attachments/assets/1fc15267-4a99-425d-9c37-dfa9dc3099d0'],
 ];
 ?>
 <section class="card">

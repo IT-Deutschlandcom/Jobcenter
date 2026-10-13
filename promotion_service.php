@@ -164,6 +164,14 @@ function duty_action($actorId, $targetId, $action, $promotionId = 0, $adjustment
                 (int) $promotion['to_step'] !== $next['rank_step']) {
                 throw new DomainException('Die Beförderung ist nicht mehr gültig.');
             }
+            if ($next['rank_id'] !== (int) $user['rank_id'] && (int) $user['rank_id'] <= 49) {
+                $period = service_query('SELECT p.id FROM payroll_periods p JOIN payroll_period_members m ON m.period_id = p.id WHERE p.rank_id = ? AND p.ended_at IS NULL AND m.user_id = ?',
+                    [$user['rank_id'], $targetId])->fetch();
+                if ($period) {
+                    service_query('UPDATE payroll_period_members SET final_total_seconds = ? WHERE period_id = ? AND user_id = ? AND final_total_seconds IS NULL',
+                        [$user['total_seconds'], $period['id'], $targetId]);
+                }
+            }
             service_query('UPDATE users SET rank_id = ?, rank_step = ?, promotion_seconds = promotion_seconds - ? WHERE id = ?',
                 [$next['rank_id'], $next['rank_step'], PROMOTION_INTERVAL, $targetId]);
             if ($next['rank_id'] <= 49) {
@@ -182,7 +190,7 @@ function duty_action($actorId, $targetId, $action, $promotionId = 0, $adjustment
         }
         $adjustmentMinutes = (int) $adjustmentMinutes;
         if ($adjustmentMinutes !== 0) {
-            if (!can_manage($actor) || abs($adjustmentMinutes) > 1440) {
+            if (!can_manage($actor) || !in_array($action, ['start', 'stop'], true) || abs($adjustmentMinutes) > 1440) {
                 throw new DomainException('Bonus- und Strafminuten dürfen nur Führungskräfte bis maximal 1440 Minuten setzen.');
             }
             $period = service_query('SELECT p.id FROM payroll_periods p JOIN payroll_period_members m ON m.period_id = p.id WHERE p.rank_id = ? AND p.ended_at IS NULL AND m.user_id = ?',
@@ -190,18 +198,9 @@ function duty_action($actorId, $targetId, $action, $promotionId = 0, $adjustment
             if (!$period) {
                 throw new DomainException('Für den Rang des Mitarbeiters muss zuerst eine Lohnperiode gestartet werden.');
             }
-            if ($adjustmentMinutes < 0) {
-                $member = service_query('SELECT baseline_seconds, paid_seconds, adjustment_seconds FROM payroll_period_members WHERE period_id = ? AND user_id = ? FOR UPDATE',
-                    [$period['id'], $targetId])->fetch();
-                $available = (int) $user['total_seconds'] - (int) $member['baseline_seconds']
-                    + (int) $member['adjustment_seconds'] - (int) $member['paid_seconds'];
-                if (abs($adjustmentMinutes) * 60 > $available) {
-                    throw new DomainException('Die Strafminuten dürfen den noch unbezahlten Zeitraum nicht unterschreiten.');
-                }
-            }
             $adjustmentSeconds = $adjustmentMinutes * 60;
-            service_query('INSERT INTO payroll_adjustments (period_id, user_id, actor_id, adjustment_seconds, created_at) VALUES (?, ?, ?, ?, ?)',
-                [$period['id'], $targetId, $actorId, $adjustmentSeconds, $now]);
+            service_query('INSERT INTO payroll_adjustments (period_id, user_id, actor_id, duty_action, adjustment_seconds, created_at) VALUES (?, ?, ?, ?, ?, ?)',
+                [$period['id'], $targetId, $actorId, $action, $adjustmentSeconds, $now]);
             service_query('UPDATE payroll_period_members SET adjustment_seconds = adjustment_seconds + ? WHERE period_id = ? AND user_id = ?',
                 [$adjustmentSeconds, $period['id'], $targetId]);
         }

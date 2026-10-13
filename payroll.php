@@ -43,7 +43,7 @@ page_header('Lohnberechnung', $user);
             <tr>
                 <td><?= h($member['username']) ?><br><small><?= h(rank_label($member)) ?></small></td>
                 <td><?= h(duration_label($member['period_seconds'])) ?></td>
-                <td><?= h(($member['adjustment_seconds'] >= 0 ? '+' : '') . duration_label(abs((int) $member['adjustment_seconds']))) ?></td>
+                <td><?= h(($member['adjustment_seconds'] >= 0 ? '+' : '−') . duration_label(abs((int) $member['adjustment_seconds']))) ?></td>
                 <td><?= h(duration_label($member['unpaid_seconds'])) ?></td>
                 <td><?= h(format_taler($member['payable_cents'])) ?></td>
                 <td>

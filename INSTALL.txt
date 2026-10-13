@@ -65,8 +65,10 @@ meldet aktive Mitarbeitende automatisch ab. Bonus-/Strafminuten werden als
 periodengebundene Korrekturen durch Führungskräfte gesetzt und separat protokolliert.
 
 Lohn
-2,50 Taler pro voller unbezahlter Stunde für Ränge 1–49; Restzeit und Korrekturen
-bleiben periodenbezogen erhalten. Rang 50+ erhält keine Mitarbeiter-Lohnabrechnung.
+2,50 Taler pro voller unbezahlter Stunde für Ränge 1–49 und 3 Taler je Stunde ab
+Rang 50 als festgelegte Sätze; weil Rang 50+ von der Mitarbeiter-Lohnberechnung
+ausgeschlossen ist, werden nur Ränge 1–49 über Lohnperioden abgerechnet. Restzeit
+und Korrekturen bleiben periodenbezogen erhalten.
 Lohnperioden werden pro Rang separat durch Rang 65+ gestartet und beendet. Während
 einer laufenden Periode kann die bis dahin geleistete Zeit bereits berechnet werden.
 Führungskräfte werden nicht zur Dienst- oder Lohnberechnung angemeldet; ihre BF-Zeit

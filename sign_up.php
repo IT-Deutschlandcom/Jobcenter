@@ -21,8 +21,10 @@ if ($username === '' || strlen($username) > 100) {
 } elseif ($avatar !== '' && safe_avatar_url($avatar) === '') {
     $registrationError = 'Der Avatar muss eine gültige HTTP- oder HTTPS-URL sein.';
 } else {
+    $transactionOpen = false;
     try {
         db()->beginTransaction();
+        $transactionOpen = true;
         $statement = db()->prepare(
             'INSERT INTO users (username, password, email, avatar, signup_date) VALUES (?, ?, ?, ?, ?)'
         );
@@ -34,10 +36,11 @@ if ($username === '' || strlen($username) > 100) {
                 [$period['id'], $userId]);
         }
         db()->commit();
+        $transactionOpen = false;
         header('Location: index.php?registered=1');
         exit;
     } catch (PDOException $exception) {
-        if (db()->inTransaction()) {
+        if ($transactionOpen) {
             db()->rollBack();
         }
         $registrationError = ($exception->errorInfo[1] ?? null) === 1062

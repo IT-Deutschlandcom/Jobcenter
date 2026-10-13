@@ -11,7 +11,8 @@ CREATE TABLE users (
     promotion_seconds BIGINT UNSIGNED NOT NULL DEFAULT 0,
     paid_seconds BIGINT UNSIGNED NOT NULL DEFAULT 0,
     active_since BIGINT DEFAULT NULL,
-    active_by BIGINT UNSIGNED DEFAULT NULL
+    active_by BIGINT UNSIGNED DEFAULT NULL,
+    KEY rank_id_idx (rank_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE payroll_periods (
@@ -44,6 +45,7 @@ CREATE TABLE payroll_adjustments (
     period_id BIGINT UNSIGNED NOT NULL,
     user_id BIGINT UNSIGNED NOT NULL,
     actor_id BIGINT UNSIGNED NOT NULL,
+    duty_action VARCHAR(10) NOT NULL,
     adjustment_seconds INT NOT NULL,
     created_at BIGINT NOT NULL,
     FOREIGN KEY (period_id, user_id) REFERENCES payroll_period_members(period_id, user_id),

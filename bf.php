@@ -61,11 +61,11 @@ page_header('BF-Panel', $user);
 </section>
 <section class="card">
     <h2>Bonus- und Strafminuten <small>Letzte 100 Einträge</small></h2>
-    <div class="table-scroll"><table><thead><tr><th>Mitarbeiter</th><th>Minuten</th><th>Grund</th><th>Gesetzt von</th><th>Zeitpunkt</th></tr></thead><tbody>
+    <div class="table-scroll"><table><thead><tr><th>Mitarbeiter</th><th>Aktion</th><th>Minuten</th><th>Art</th><th>Gesetzt von</th><th>Zeitpunkt</th></tr></thead><tbody>
     <?php foreach ($adjustments as $adjustment): ?>
-        <tr><td><?= h($adjustment['username']) ?></td><td><?= (int) ($adjustment['adjustment_seconds'] / 60) ?></td><td><?= (int) $adjustment['adjustment_seconds'] > 0 ? 'Bonus' : 'Strafe' ?></td><td><?= h($adjustment['actor_name']) ?></td><td><?= h(date('d.m.Y H:i', $adjustment['created_at'])) ?></td></tr>
+        <tr><td><?= h($adjustment['username']) ?></td><td><?= $adjustment['duty_action'] === 'start' ? 'Anmelden' : 'Abmelden' ?></td><td><?= (int) ($adjustment['adjustment_seconds'] / 60) ?></td><td><?= (int) $adjustment['adjustment_seconds'] > 0 ? 'Bonus' : 'Strafe' ?></td><td><?= h($adjustment['actor_name']) ?></td><td><?= h(date('d.m.Y H:i', $adjustment['created_at'])) ?></td></tr>
     <?php endforeach; ?>
-    <?php if (!$adjustments): ?><tr><td colspan="5">Noch keine Zeitkorrekturen.</td></tr><?php endif; ?>
+    <?php if (!$adjustments): ?><tr><td colspan="6">Noch keine Zeitkorrekturen.</td></tr><?php endif; ?>
     </tbody></table></div>
 </section>
 <?php page_footer(); ?>
