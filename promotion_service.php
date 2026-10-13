@@ -13,18 +13,45 @@ function service_query($sql, $params = [])
 
 function earned_seconds($user, $now)
 {
-    return $user['active_since'] === null ? 0 : max(0, $now - (int) $user['active_since']);
+    if ($user['active_since'] === null) {
+        return 0;
+    }
+    $start = (int) $user['active_since'];
+    $hour = (int) date('G', $start);
+    if ($hour >= 1 && $hour < 8) {
+        return 0;
+    }
+    $windowEnd = $hour < 1
+        ? strtotime('today 01:00', $start)
+        : strtotime('tomorrow 01:00', $start);
+    return max(0, min((int) $now, $windowEnd) - $start);
+}
+
+function duty_open($timestamp)
+{
+    $hour = (int) date('G', $timestamp);
+    return $hour >= 8 || $hour < 1;
 }
 
 function accrue_time(&$user, $now)
 {
     $elapsed = earned_seconds($user, $now);
     if ($user['active_since'] !== null) {
-        service_query('UPDATE users SET total_seconds = total_seconds + ?, promotion_seconds = promotion_seconds + ?, active_since = ? WHERE id = ?',
-            [$elapsed, $elapsed, $now, $user['id']]);
+        $start = (int) $user['active_since'];
+        $hour = (int) date('G', $start);
+        $windowEnd = $hour >= 1 && $hour < 8
+            ? $start
+            : ($hour < 1 ? strtotime('today 01:00', $start) : strtotime('tomorrow 01:00', $start));
+        $closed = $now >= $windowEnd;
+        service_query('UPDATE users SET total_seconds = total_seconds + ?, promotion_seconds = promotion_seconds + ?, active_since = ?, active_by = ? WHERE id = ?',
+            [$elapsed, $elapsed, $closed ? null : $now, $closed ? null : $user['active_by'], $user['id']]);
         $user['total_seconds'] += $elapsed;
         $user['promotion_seconds'] += $elapsed;
-        $user['active_since'] = $now;
+        $user['active_since'] = $closed ? null : $now;
+        if ($closed) {
+            service_query('INSERT INTO duty_log (user_id, actor_id, action, happened_at) VALUES (?, ?, ?, ?)',
+                [$user['id'], $user['active_by'] ?: $user['id'], 'auto_stop', $windowEnd]);
+        }
     }
 }
 
@@ -71,8 +98,12 @@ function synchronize_visible_users($viewer)
     }
 }
 
-function duty_action($actorId, $targetId, $action, $promotionId = 0)
+function duty_action($actorId, $targetId, $action, $promotionId = 0, $adjustmentMinutes = 0, $now = null)
 {
+    $now = $now ?? time();
+    if ($action === 'start' && !duty_open($now)) {
+        throw new DomainException('Dienstanmeldungen sind täglich nur von 08:00 bis 01:00 Uhr möglich.');
+    }
     db()->beginTransaction();
     try {
         // Einheitliche Sperrreihenfolge verhindert konkurrierende Doppelbeförderungen.
@@ -90,12 +121,23 @@ function duty_action($actorId, $targetId, $action, $promotionId = 0)
         if (!can_manage($actor) && !($action === 'stop' && $actorId == $targetId)) {
             throw new DomainException('Keine Berechtigung für diese Aktion.');
         }
+        if ((int) $user['rank_id'] < 1 || (int) $user['rank_id'] > 49) {
+            throw new DomainException('Dienstverwaltung ist ausschließlich für Ränge 1 bis 49 vorgesehen.');
+        }
         if ($action === 'start' && $actorId == $targetId) {
             throw new DomainException('Selbsteintragungen sind nicht erlaubt. Bitte eine andere Führungskraft um Dienstanmeldung.');
         }
-        $now = time();
+        $wasActive = $user['active_since'] !== null;
         accrue_time($user, $now);
+        if ($action === 'stop' && $wasActive && $user['active_since'] === null) {
+            create_due_promotion($user, $now);
+            db()->commit();
+            return;
+        }
         if ($action === 'start') {
+            if (!duty_open($now)) {
+                throw new DomainException('Dienstanmeldungen sind täglich nur von 08:00 bis 01:00 Uhr möglich.');
+            }
             if ($user['active_since'] !== null) {
                 throw new DomainException('Dieser Mitarbeiter ist bereits im Dienst.');
             }
@@ -106,7 +148,7 @@ function duty_action($actorId, $targetId, $action, $promotionId = 0)
             if ($user['active_since'] === null) {
                 throw new DomainException('Dieser Mitarbeiter ist bereits abgemeldet.');
             }
-            service_query('UPDATE users SET active_since = NULL WHERE id = ?', [$targetId]);
+            service_query('UPDATE users SET active_since = NULL, active_by = NULL WHERE id = ?', [$targetId]);
             $user['active_since'] = null;
         } elseif ($action === 'confirm') {
             if ($actorId == $targetId) {
@@ -124,11 +166,44 @@ function duty_action($actorId, $targetId, $action, $promotionId = 0)
             }
             service_query('UPDATE users SET rank_id = ?, rank_step = ?, promotion_seconds = promotion_seconds - ? WHERE id = ?',
                 [$next['rank_id'], $next['rank_step'], PROMOTION_INTERVAL, $targetId]);
+            if ($next['rank_id'] <= 49) {
+                $period = service_query('SELECT id FROM payroll_periods WHERE rank_id = ? AND ended_at IS NULL',
+                    [$next['rank_id']])->fetch();
+                if ($period) {
+                    service_query('INSERT IGNORE INTO payroll_period_members (period_id, user_id, baseline_seconds) VALUES (?, ?, ?)',
+                        [$period['id'], $targetId, $user['total_seconds']]);
+                }
+            }
             service_query('UPDATE promotions SET confirmed_by = ?, confirmed_at = ? WHERE id = ?', [$actorId, $now, $promotionId]);
             $user = array_merge($user, $next);
             $user['promotion_seconds'] -= PROMOTION_INTERVAL;
         } else {
             throw new DomainException('Unbekannte Aktion.');
+        }
+        $adjustmentMinutes = (int) $adjustmentMinutes;
+        if ($adjustmentMinutes !== 0) {
+            if (!can_manage($actor) || abs($adjustmentMinutes) > 1440) {
+                throw new DomainException('Bonus- und Strafminuten dürfen nur Führungskräfte bis maximal 1440 Minuten setzen.');
+            }
+            $period = service_query('SELECT p.id FROM payroll_periods p JOIN payroll_period_members m ON m.period_id = p.id WHERE p.rank_id = ? AND p.ended_at IS NULL AND m.user_id = ?',
+                [$user['rank_id'], $targetId])->fetch();
+            if (!$period) {
+                throw new DomainException('Für den Rang des Mitarbeiters muss zuerst eine Lohnperiode gestartet werden.');
+            }
+            if ($adjustmentMinutes < 0) {
+                $member = service_query('SELECT baseline_seconds, paid_seconds, adjustment_seconds FROM payroll_period_members WHERE period_id = ? AND user_id = ? FOR UPDATE',
+                    [$period['id'], $targetId])->fetch();
+                $available = (int) $user['total_seconds'] - (int) $member['baseline_seconds']
+                    + (int) $member['adjustment_seconds'] - (int) $member['paid_seconds'];
+                if (abs($adjustmentMinutes) * 60 > $available) {
+                    throw new DomainException('Die Strafminuten dürfen den noch unbezahlten Zeitraum nicht unterschreiten.');
+                }
+            }
+            $adjustmentSeconds = $adjustmentMinutes * 60;
+            service_query('INSERT INTO payroll_adjustments (period_id, user_id, actor_id, adjustment_seconds, created_at) VALUES (?, ?, ?, ?, ?)',
+                [$period['id'], $targetId, $actorId, $adjustmentSeconds, $now]);
+            service_query('UPDATE payroll_period_members SET adjustment_seconds = adjustment_seconds + ? WHERE period_id = ? AND user_id = ?',
+                [$adjustmentSeconds, $period['id'], $targetId]);
         }
         if ($action !== 'confirm') {
             service_query('INSERT INTO duty_log (user_id, actor_id, action, happened_at) VALUES (?, ?, ?, ?)',

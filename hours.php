@@ -4,6 +4,9 @@ $user = require_login();
 synchronize_visible_users($user);
 $user = current_user();
 $work = work_summary($user, time());
+$period = (int) $user['rank_id'] >= 1 && (int) $user['rank_id'] <= 49
+    ? active_payroll_period((int) $user['rank_id']) : null;
+$periodMember = $period ? (payroll_period_summary($period['id'], $user['id'])['members'][0] ?? null) : null;
 $members = service_query('SELECT id, username, rank_id, rank_step, total_seconds, promotion_seconds, active_since FROM users'
     . (can_manage($user) ? '' : ' WHERE id = ?') . ' ORDER BY total_seconds DESC, username',
     can_manage($user) ? [] : [$user['id']])->fetchAll();
@@ -11,10 +14,18 @@ $payouts = service_query('SELECT p.*, a.username AS actor_name FROM payouts p JO
 page_header('Gesammelte Stunden', $user);
 ?>
 <section class="card">
-    <h2>Deine Stunden & dein Lohn</h2>
-    <p>Gesamtzeit: <strong id="work-total"><?= h(duration_label($work['total_seconds'])) ?></strong> · Bereits ausgezahlt: <strong id="work-paid"><?= $work['paid_taler'] ?> Taler</strong></p>
-    <p>Voraussichtlich am Lohntag: <strong id="work-payable"><?= $work['payable_taler'] ?> Taler</strong> (4 Taler je voller unbezahlter Dienststunde).</p>
-    <p>Unbezahlte Zeit: <?= h(duration_label($work['unpaid_seconds'])) ?>. Restminuten werden in die nächste Auszahlung übernommen. Beförderungen kürzen deinen Lohn nicht.</p>
+    <h2>Deine Stunden<?= (int) $user['rank_id'] <= 49 ? ' & dein Lohn' : '' ?></h2>
+    <p>Gesamtzeit: <strong id="work-total"><?= h(duration_label($work['total_seconds'])) ?></strong></p>
+    <?php if ((int) $user['rank_id'] >= 1 && (int) $user['rank_id'] <= 49): ?>
+        <?php if ($periodMember): ?>
+            <p>Lohnperiode: <?= h(duration_label($periodMember['unpaid_seconds'])) ?> offen · <?= h(format_taler($periodMember['payable_cents'])) ?> auszahlbar · <?= h(format_taler($periodMember['paid_cents'])) ?> in dieser Periode ausgezahlt.</p>
+        <?php else: ?>
+            <p>Für deinen Rang läuft derzeit keine Lohnperiode. Die Führung kann eine Periode starten.</p>
+        <?php endif; ?>
+        <p>Grundlohn 2,50 Taler pro voller Stunde. Restminuten bleiben innerhalb der jeweiligen Lohnperiode erhalten.</p>
+    <?php else: ?>
+        <p>Vorgesetzte sind von der Mitarbeiter-Lohnberechnung ausgeschlossen. Ihre BF-Stunden werden separat sonntags addiert.</p>
+    <?php endif; ?>
 </section>
 <section class="card">
     <h2><?= can_manage($user) ? 'Dienstzeit-Rangliste' : 'Deine Dienstzeit' ?></h2>

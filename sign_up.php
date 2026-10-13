@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/promotion_service.php';
 require_csrf();
 
 $username = trim(post_string('username'));
@@ -21,13 +22,24 @@ if ($username === '' || strlen($username) > 100) {
     $registrationError = 'Der Avatar muss eine gültige HTTP- oder HTTPS-URL sein.';
 } else {
     try {
+        db()->beginTransaction();
         $statement = db()->prepare(
             'INSERT INTO users (username, password, email, avatar, signup_date) VALUES (?, ?, ?, ?, ?)'
         );
         $statement->execute([$username, password_hash($password, PASSWORD_DEFAULT), $email, $avatar, time()]);
+        $userId = (int) db()->lastInsertId();
+        $period = service_query('SELECT id FROM payroll_periods WHERE rank_id = 1 AND ended_at IS NULL')->fetch();
+        if ($period) {
+            service_query('INSERT INTO payroll_period_members (period_id, user_id, baseline_seconds) VALUES (?, ?, 0)',
+                [$period['id'], $userId]);
+        }
+        db()->commit();
         header('Location: index.php?registered=1');
         exit;
     } catch (PDOException $exception) {
+        if (db()->inTransaction()) {
+            db()->rollBack();
+        }
         $registrationError = ($exception->errorInfo[1] ?? null) === 1062
             ? 'Dieser Benutzername ist bereits vergeben.'
             : 'Die Registrierung ist derzeit nicht verfügbar. Bitte versuche es später erneut.';

@@ -10,9 +10,10 @@ try {
     if (post_string('delivered') !== '1') {
         throw new DomainException('Bitte die tatsächliche Übergabe der Taler bestätigen.');
     }
-    $taler = record_payout((int) $user['id'], (int) post_string('user_id'),
-        (int) post_string('paid_seconds'), (int) post_string('taler'));
-    $_SESSION['flash'] = $taler . ' Taler als ausgezahlt protokolliert.';
+    $cents = record_payout((int) $user['id'], (int) post_string('period_id'),
+        (int) post_string('user_id'), (int) post_string('paid_seconds'),
+        (int) post_string('taler_cents'));
+    $_SESSION['flash'] = format_taler($cents) . ' als ausgezahlt protokolliert.';
 } catch (DomainException $error) {
     $_SESSION['flash'] = $error->getMessage();
 } catch (Throwable $error) {

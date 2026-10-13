@@ -28,7 +28,8 @@ function page_header($title, $user)
                 $links['hours.php'] = 'Gesammelte Stunden';
             }
             if (can_view_payroll($user)) {
-                $links['payroll.php'] = 'Director · Lohnverwaltung';
+                $links['payroll.php'] = 'Lohnberechnung';
+                $links['payroll_periods.php'] = 'Lohnperioden';
             }
             foreach ($links as $url => $label) {
                 $active = basename($_SERVER['SCRIPT_NAME']) === strtok($url, '?');
@@ -85,6 +86,11 @@ function action_form($target, $action, $label, $promotion = 0)
     <input type="hidden" name="user_id" value="<?= (int) $target ?>">
     <input type="hidden" name="action" value="<?= h($action) ?>">
     <input type="hidden" name="promotion_id" value="<?= (int) $promotion ?>">
+    <?php if (in_array($action, ['start', 'stop'], true) && can_manage(current_user())): ?>
+        <label>Bonus-/Strafminuten
+            <input type="number" name="adjustment_minutes" min="-1440" max="1440" step="1" value="0">
+        </label>
+    <?php endif; ?>
     <button<?= $action === 'stop' ? ' class="secondary"' : '' ?>><?= h($label) ?></button>
 </form>
     <?php

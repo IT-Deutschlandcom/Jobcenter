@@ -4,7 +4,7 @@ $user = require_login();
 require_csrf();
 try {
     duty_action((int) $user['id'], (int) post_string('user_id'),
-        post_string('action'), (int) post_string('promotion_id'));
+        post_string('action'), (int) post_string('promotion_id'), (int) post_string('adjustment_minutes'));
     $_SESSION['flash'] = 'Aktion erfolgreich gespeichert.';
 } catch (DomainException $error) {
     $_SESSION['flash'] = $error->getMessage();
