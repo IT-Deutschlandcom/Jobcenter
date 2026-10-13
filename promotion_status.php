@@ -19,8 +19,15 @@ try {
             'due_hours' => (int) floor($credit / PROMOTION_INTERVAL),
             'rank' => rank_label(['rank_id' => $promotion['to_rank'], 'rank_step' => $promotion['to_step']])];
     }
+    $period = (int) $user['rank_id'] >= 1 && (int) $user['rank_id'] <= 49
+        ? active_payroll_period((int) $user['rank_id']) : null;
+    $periodMember = $period
+        ? (payroll_period_summary($period['id'], $user['id'])['members'][0] ?? null) : null;
+    $work = work_summary($user, time());
+    $work['payable_cents'] = $periodMember['payable_cents'] ?? null;
+    $work['paid_cents'] = $periodMember['paid_cents'] ?? null;
     echo json_encode(['promotions' => $items, 'can_manage' => can_manage($user),
-        'work' => work_summary($user, time())]);
+        'work' => $work]);
 } catch (Throwable $error) {
     error_log('EURO promotion polling failed: ' . $error->getMessage());
     http_response_code(503);

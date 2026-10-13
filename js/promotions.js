@@ -18,9 +18,13 @@
             const total = document.getElementById('work-total');
             if (total) total.textContent = `${Math.floor(data.work.total_seconds / 3600)} h ${Math.floor(data.work.total_seconds % 3600 / 60)} min`;
             const payable = document.getElementById('work-payable');
-            if (payable) payable.textContent = `${data.work.payable_taler} Taler`;
+            if (payable) payable.textContent = data.work.payable_cents === null
+                ? '—'
+                : `${new Intl.NumberFormat('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(data.work.payable_cents / 100)} Taler`;
             const paid = document.getElementById('work-paid');
-            if (paid) paid.textContent = `${data.work.paid_taler} Taler`;
+            if (paid) paid.textContent = data.work.paid_cents === null
+                ? '—'
+                : `${new Intl.NumberFormat('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(data.work.paid_cents / 100)} Taler`;
             const signature = data.promotions.map(item => `${item.id}:${item.due_hours}`).join(',');
             list.replaceChildren();
             for (const item of data.promotions) {

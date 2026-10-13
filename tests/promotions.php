@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__DIR__) . '/payroll_service.php';
+date_default_timezone_set('Europe/Berlin');
 if (PHP_SAPI !== 'cli' || getenv('EURO_DB_NAME') !== 'euro_test') {
     exit("Nur CLI mit separater Datenbank EURO_DB_NAME=euro_test.\n");
 }
@@ -23,45 +24,51 @@ function denied($operation)
 
 $ids = [];
 try {
-    foreach ([50, 1, 20, 55] as $rank) {
+    foreach ([50, 1, 20, 65] as $rank) {
         service_query('INSERT INTO users (username, password, email, avatar, signup_date, rank_id) VALUES (?, ?, ?, ?, ?, ?)',
             ['test_' . bin2hex(random_bytes(8)), password_hash('test-only-passphrase', PASSWORD_DEFAULT), 'test@example.invalid', '', time(), $rank]);
         $ids[] = (int) db()->lastInsertId();
     }
     [$leader, $member, $intel, $director] = $ids;
     $get = fn($id) => service_query('SELECT * FROM users WHERE id = ?', [$id])->fetch();
-    check(count(rank_catalog()) === 55, 'Rangkatalog unvollständig.');
+    check(count(rank_catalog()) === 75, 'Rangkatalog unvollständig.');
     check(!can_manage($get($member)) && can_manage($get($leader)), 'Führungsgrenze falsch.');
     check(!can_manage(['rank_id' => 49]) && can_manage(['rank_id' => 51]), 'Squad-Leader-Grenze falsch.');
-    check(!can_view_payroll(['rank_id' => 54]) && can_view_payroll($get($director)), 'Director-Grenze falsch.');
-    $sample = ['total_seconds' => 7199, 'paid_seconds' => 0, 'active_since' => null];
-    check(work_summary($sample, time())['payable_taler'] === 4, 'Teilzeit wurde als volle Stunde bezahlt.');
+    check(!can_view_payroll(['rank_id' => 64]) && can_view_payroll($get($director)), 'Director-Grenze falsch.');
+    $sample = ['total_seconds' => 3599, 'paid_seconds' => 0, 'active_since' => null, 'rank_id' => 1];
+    check(work_summary($sample, time())['payable_cents'] === 0, 'Unvollständige Stunde wurde bezahlt.');
     $sample['total_seconds'] = 7200;
     $sample['paid_seconds'] = 3600;
-    check(work_summary($sample, time())['payable_taler'] === 4, 'Bezahlte Stunden erneut berechnet.');
-    $sample['active_since'] = 1000;
-    check(work_summary($sample, 4600)['payable_taler'] === 8, 'Laufender Dienst fehlt im Lohn.');
-    foreach ([[19, 0, 20, 0], [20, 0, 20, 1], [20, 10, 21, 0], [48, 10, 49, 0], [49, 0, 49, 1], [49, 9, 49, 10]] as $case) {
+    check(work_summary($sample, time())['payable_cents'] === 250, 'Bezahlte Stunden erneut berechnet.');
+    $sample['active_since'] = strtotime('today 09:00:00');
+    check(work_summary($sample, strtotime('today 10:00:00'))['payable_cents'] === 500, 'Laufender Dienst fehlt im Lohn.');
+    check(payroll_rate_cents(50) === 300 && work_summary(['total_seconds' => 3600, 'paid_seconds' => 0, 'active_since' => null, 'rank_id' => 50], time())['payable_cents'] === 0, 'Vorgesetzte werden in die Mitarbeiter-Lohnberechnung aufgenommen.');
+    check(!duty_open(strtotime('today 07:59:59')) && duty_open(strtotime('today 08:00:00'))
+        && !duty_open(strtotime('today 01:00:00')) && duty_open(strtotime('today 00:30:00')), 'Öffnungszeiten falsch.');
+    check(earned_seconds(['active_since' => strtotime('today 00:30:00')], strtotime('today 02:00:00')) === 1800, 'Dienst endet nicht um 01:00 Uhr.');
+    foreach ([[19, 0, 20, 0], [20, 0, 20, 1], [20, 10, 21, 0], [34, 10, 35, 0], [48, 20, 49, 0], [49, 0, 49, 1], [49, 19, 49, 20]] as $case) {
         check(next_rank(['rank_id' => $case[0], 'rank_step' => $case[1]]) === ['rank_id' => $case[2], 'rank_step' => $case[3]], 'Rangübergang falsch.');
     }
-    check(next_rank(['rank_id' => 49, 'rank_step' => 10]) === null, 'Führungsrechte automatisch vergeben.');
+    check(next_rank(['rank_id' => 49, 'rank_step' => 20]) === null, 'Führungsrechte automatisch vergeben.');
     check(earned_seconds(['active_since' => null], time()) === 0, 'Offlinezeit wurde gezählt.');
     denied(fn() => duty_action($member, $intel, 'start'));
     denied(fn() => duty_action($member, $member, 'start'));
     denied(fn() => duty_action($leader, $leader, 'start'));
     denied(fn() => duty_action($director, $director, 'start'));
-    duty_action($leader, $member, 'start');
+    $testNow = strtotime('today 12:00:00');
+    $firstPeriod = start_payroll_period($director, 1);
+    duty_action($leader, $member, 'start', 0, 10, $testNow);
     denied(fn() => duty_action($leader, $member, 'start'));
-    service_query('UPDATE users SET active_since = ? WHERE id = ?', [time() - 1800, $member]);
+    service_query('UPDATE users SET active_since = ? WHERE id = ?', [$testNow - 1800, $member]);
     denied(fn() => duty_action($intel, $member, 'stop'));
-    duty_action($member, $member, 'stop');
+    duty_action($member, $member, 'stop', 0, 0, $testNow);
     $first = $get($member);
     check($first['total_seconds'] >= 1800 && $first['total_seconds'] < 1810, 'Erster Dienst falsch addiert.');
     check($first['active_since'] === null, 'Dienst nicht beendet.');
     denied(fn() => duty_action($leader, $member, 'stop'));
-    duty_action($leader, $member, 'start');
-    service_query('UPDATE users SET active_since = ? WHERE id = ?', [time() - 5417, $member]);
-    duty_action($leader, $member, 'stop');
+    duty_action($leader, $member, 'start', 0, 0, $testNow);
+    service_query('UPDATE users SET active_since = ? WHERE id = ?', [$testNow - 5417, $member]);
+    duty_action($leader, $member, 'stop', 0, -5, $testNow);
     $saved = $get($member);
     check($saved['total_seconds'] >= 7217 && $saved['total_seconds'] < 7230, 'Restzeit nicht über Dienste addiert.');
     synchronize_user($member);
@@ -69,6 +76,10 @@ try {
     $pending = pending_promotions($saved);
     check(count($pending) === 1, 'Doppelter offener Vorschlag.');
     check((int) $pending[0]['created_by'] === $leader, 'Ersteller/Dienstanmelder fehlt.');
+    $adjustments = service_query('SELECT adjustment_seconds, duty_action FROM payroll_adjustments WHERE period_id = ? AND user_id = ? ORDER BY id', [$firstPeriod, $member])->fetchAll();
+    check(count($adjustments) === 2 && (int) $adjustments[0]['adjustment_seconds'] === 600
+        && $adjustments[0]['duty_action'] === 'start' && (int) $adjustments[1]['adjustment_seconds'] === -300
+        && $adjustments[1]['duty_action'] === 'stop', 'Bonus-/Strafminuten wurden nicht korrekt protokolliert.');
     denied(fn() => duty_action($member, $member, 'confirm', $pending[0]['id']));
     duty_action($leader, $member, 'confirm', $pending[0]['id']);
     denied(fn() => duty_action($leader, $member, 'confirm', $pending[0]['id']));
@@ -87,36 +98,60 @@ try {
     $intelPending = pending_promotions($get($intel));
     duty_action($leader, $intel, 'confirm', $intelPending[0]['id']);
     check((int) $get($intel)['rank_step'] === 1 && (int) $get($intel)['rank_id'] === 20, 'Intel 0/10 → 1/10 falsch.');
-    service_query('UPDATE users SET rank_id = 49, rank_step = 9, promotion_seconds = 7200 WHERE id = ?', [$intel]);
+    service_query('UPDATE users SET rank_id = 49, rank_step = 19, promotion_seconds = 7200 WHERE id = ?', [$intel]);
     synchronize_user($intel);
     $elitePending = pending_promotions($get($intel));
     check(count($elitePending) === 1, 'Letzter Intel-Schritt fehlt.');
     duty_action($leader, $intel, 'confirm', $elitePending[0]['id']);
-    check((int) $get($intel)['rank_step'] === 10, 'Europol Elite 10/10 nicht erreicht.');
+    check((int) $get($intel)['rank_step'] === 20, 'Europol Elite 20/20 nicht erreicht.');
     synchronize_user($intel);
     check(pending_promotions($get($intel)) === [], 'Elite hat automatischen Aufstieg.');
+    $memberBeforePeriod = $get($member);
+    $secondPeriod = start_payroll_period($director, (int) $memberBeforePeriod['rank_id']);
+    service_query('UPDATE users SET total_seconds = total_seconds + 7200 WHERE id = ?', [$member]);
     $beforePay = $get($member);
-    denied(fn() => record_payout($leader, $member, 0, 8));
-    denied(fn() => record_payout($member, $member, 0, 8));
-    denied(fn() => record_payout($director, $member, 0, 4));
-    check(record_payout($director, $member, 0, 8) === 8, '4 Taler je voller Stunde fehlen.');
+    denied(fn() => record_payout($leader, $secondPeriod, $member, 0, 500));
+    denied(fn() => record_payout($member, $secondPeriod, $member, 0, 500));
+    denied(fn() => record_payout($director, $secondPeriod, $member, 0, 400));
+    check(record_payout($director, $secondPeriod, $member, 0, 500) === 500, '2,50 Taler je voller Stunde fehlen.');
     $afterPay = $get($member);
     check((int) $afterPay['paid_seconds'] === 7200, 'Ausgezahlte Zeit falsch.');
     check($afterPay['total_seconds'] === $beforePay['total_seconds'], 'Auszahlung löscht Arbeitszeit.');
     check($afterPay['promotion_seconds'] === $beforePay['promotion_seconds'], 'Auszahlung verbraucht Beförderungszeit.');
     check(work_summary($afterPay, time())['unpaid_seconds'] === (int) $beforePay['total_seconds'] - 7200, 'Restsekunden verloren.');
-    denied(fn() => record_payout($director, $member, 0, 8));
+    denied(fn() => record_payout($director, $secondPeriod, $member, 0, 500));
     service_query('UPDATE users SET total_seconds = total_seconds + 7200 WHERE id = ?', [$member]);
-    denied(fn() => record_payout($director, $member, 0, 8));
-    check(record_payout($director, $member, 7200, 8) === 8, 'Neuer Lohntag falsch.');
+    denied(fn() => record_payout($director, $secondPeriod, $member, 0, 500));
+    check(record_payout($director, $secondPeriod, $member, 7200, 500) === 500, 'Neue Auszahlung falsch.');
     $payAudit = service_query('SELECT * FROM payouts WHERE user_id = ? ORDER BY id', [$member])->fetchAll();
-    check(count($payAudit) === 2 && (int) $payAudit[0]['actor_id'] === $director && (int) $payAudit[0]['taler'] === 8, 'Auszahlungsprotokoll fehlt.');
-    echo "Alle EURO-Rang-, Zeit-, Berechtigungs-, Lohn- und Audit-Tests bestanden.\n";
+    check(count($payAudit) === 2 && (int) $payAudit[0]['actor_id'] === $director && (float) $payAudit[0]['taler'] === 5.0, 'Auszahlungsprotokoll fehlt.');
+    end_payroll_period($director, $secondPeriod);
+    check(service_query('SELECT ended_at FROM payroll_periods WHERE id = ?', [$secondPeriod])->fetchColumn() !== null, 'Lohnperiode wurde nicht beendet.');
+    $beforeAutoStop = (int) $get($member)['total_seconds'];
+    service_query('UPDATE users SET active_since = ?, active_by = ? WHERE id = ?', [strtotime('today 00:30:00'), $leader, $member]);
+    $autoStopUser = $get($member);
+    db()->beginTransaction();
+    try {
+        accrue_time($autoStopUser, strtotime('today 01:00:00'));
+        db()->commit();
+    } catch (Throwable $error) {
+        db()->rollBack();
+        throw $error;
+    }
+    check($autoStopUser['active_since'] === null && (int) $autoStopUser['total_seconds'] === $beforeAutoStop + 1800, 'Automatische Abmeldung um 01:00 Uhr fehlerhaft.');
+    echo "Alle EURO-Rang-, Zeit-, Berechtigungs-, Perioden-, Lohn- und Audit-Tests bestanden.\n";
 } finally {
     foreach ($ids as $id) {
         service_query('DELETE FROM payouts WHERE user_id = ?', [$id]);
+        service_query('DELETE FROM payroll_adjustments WHERE user_id = ?', [$id]);
         service_query('DELETE FROM promotions WHERE user_id = ?', [$id]);
         service_query('DELETE FROM duty_log WHERE user_id = ?', [$id]);
+    }
+    $periodIds = service_query('SELECT id FROM payroll_periods WHERE started_by IN ('
+        . implode(',', array_fill(0, count($ids), '?')) . ')', $ids)->fetchAll(PDO::FETCH_COLUMN);
+    foreach ($periodIds as $periodId) {
+        service_query('DELETE FROM payroll_period_members WHERE period_id = ?', [$periodId]);
+        service_query('DELETE FROM payroll_periods WHERE id = ?', [$periodId]);
     }
     foreach (array_reverse($ids) as $id) {
         service_query('DELETE FROM users WHERE id = ?', [$id]);
