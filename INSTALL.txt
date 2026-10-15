@@ -1,4 +1,4 @@
-EURO CMS – PHP/MySQL, JavaScript und CSS ohne Build oder Framework
+EURO CMS – PHP/MySQL, JavaScript und CSS ohne Build; Dark UI mit Bootstrap 5.3.8 (CDN, SRI)
 
 Voraussetzungen: PHP 8.0+ mit pdo_mysql, MySQL 8.0+, HTTPS im Produktivbetrieb.
 Der Webserver muss PHP-Dateien ausführen, nicht als Quelltext ausliefern.
@@ -95,3 +95,9 @@ PHP-Dateien mit php -l prüfen, JavaScript mit node --check js/promotions.js.
 Integrationstest ausschließlich in einer separaten Datenbank namens euro_test:
 users.sql dort importieren, EURO_DB_NAME=euro_test und DB-Zugang setzen,
 dann php tests/promotions.php ausführen. Der Test entfernt nur eigene Fixtures.
+
+Oberfläche
+Bootstrap 5.3.8 wird per jsDelivr-CDN mit SRI-Hash geladen (config.php). Eigene Effekte
+liegen in css/euro.css und js/effects.js. Folgende Bilder werden in img/ erwartet:
+Banner.png, Europol-logo.png, dashboard.png, community.png, date.png, ranks.gif,
+news.gif, key.png, logout.png, moneybar_icon_coin.png, search.png, like.png.

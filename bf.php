@@ -31,11 +31,13 @@ page_header('BF-Panel', $user);
 <section class="card">
     <h2>Dienstverwaltung</h2>
     <p>Nur Ränge 1 bis 49 können angemeldet werden. Dienst ist täglich von 08:00 bis 01:00 Uhr möglich; um 01:00 Uhr erfolgt die automatische Abmeldung. Bonusminuten bitte positiv, Strafminuten negativ eintragen. Führungskräfte werden nicht für die Lohnberechnung angemeldet.</p>
-    <form method="get" action="bf.php">
+    <form class="member-search-form" method="get" action="bf.php">
         <label for="member-search">Mitarbeiter suchen</label>
+        <div class="member-search-row">
         <input id="member-search" type="search" name="q" value="<?= h($search) ?>" placeholder="Benutzername">
-        <button type="submit">Suchen</button>
+        <button type="submit"><span>Suchen</span><img class="btn-icon" src="img/search.png" alt="" width="20" height="20"></button>
         <?php if ($search !== ''): ?><a class="button secondary" href="bf.php">Suche zurücksetzen</a><?php endif; ?>
+        </div>
     </form>
     <div class="table-scroll"><table><thead><tr><th>Mitarbeiter</th><th>Rang</th><th>Status</th><th>Dienst</th></tr></thead><tbody>
     <?php foreach ($members as $member): ?>

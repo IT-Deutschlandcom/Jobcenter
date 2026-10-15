@@ -38,6 +38,21 @@ function db(): PDO
     return $connection;
 }
 
+const BOOTSTRAP_CSS_URL = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css';
+const BOOTSTRAP_CSS_SRI = 'sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB';
+const BOOTSTRAP_JS_URL = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js';
+const BOOTSTRAP_JS_SRI = 'sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI';
+
+function bootstrap_assets(): void
+{
+    echo '<link rel="stylesheet" href="' . h(BOOTSTRAP_CSS_URL) . '" integrity="' . h(BOOTSTRAP_CSS_SRI) . '" crossorigin="anonymous">';
+}
+
+function bootstrap_scripts(): void
+{
+    echo '<script src="' . h(BOOTSTRAP_JS_URL) . '" integrity="' . h(BOOTSTRAP_JS_SRI) . '" crossorigin="anonymous"></script>';
+}
+
 function h(mixed $value): string
 {
     return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');

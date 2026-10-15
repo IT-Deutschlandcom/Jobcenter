@@ -6,17 +6,23 @@ if (isset($_SESSION['userid']) && !isset($loginError) && current_user() !== null
 }
 ?>
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>EURO - Anmeldung</title>
+    <?php bootstrap_assets(); ?>
     <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script src="js/effects.js" defer></script>
 </head>
-<body>
+<body class="dark-ui auth-page">
+    <canvas id="fx-particles" aria-hidden="true"></canvas>
+    <div class="fx-aurora" aria-hidden="true"></div>
     <div id="alert"><b>Hinweis:</b> BF-Toolnutzer ohne Gruppenmitgliedschaft: Bitte stellt eine Gruppenanfrage! <div id="x"><a href="register.php">Registrieren</a></div></div>
+    <header class="banner-wrap auth-banner"><img class="site-banner" src="img/Banner.png" alt="EURO – Europol Jobcenter" width="1016" height="185"></header>
     <main class="auth-shell">
         <section class="auth-intro">
+            <img class="hero-logo" src="img/Europol-logo.png" alt="Europol Logo" width="1536" height="1024">
             <span class="brand-mark">EURO</span>
             <span class="eyebrow">Europol</span>
             <h1>Dein Jobcenter.<br>Dein Team. Dein Hotel.</h1>
@@ -44,5 +50,6 @@ if (isset($_SESSION['userid']) && !isset($loginError) && current_user() !== null
             <p>Noch kein Konto? <a href="register.php">Jetzt registrieren</a></p>
         </section>
     </main>
+    <?php bootstrap_scripts(); ?>
 </body>
 </html>
