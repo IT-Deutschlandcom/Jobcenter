@@ -23,7 +23,7 @@ function db(): PDO
     if ($connection === null) {
         $host = getenv('EURO_DB_HOST') ?: 'localhost';
         $port = getenv('EURO_DB_PORT') ?: '3306';
-        $name = getenv('EURO_DB_NAME') ?: 'euro';
+        $name = getenv('EURO_DB_NAME') ?: 'euros';
         $connection = new PDO(
             "mysql:host={$host};port={$port};dbname={$name};charset=utf8mb4",
             getenv('EURO_DB_USER') ?: '',
